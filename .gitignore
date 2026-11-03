@@ -46,3 +46,7 @@ __pycache__/
 /DESIGN_RESEARCH.md
 /REDESIGN_CHANGELOG.md
 /UI_REDESIGN_AUDIT.md
+
+# Local temporary and verification repositories
+/temp_source/
+/verify_repo/
