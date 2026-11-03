@@ -1,6 +1,6 @@
 /* ================================================================== */
 /*  Workspace pages: Dashboard, Design Lab, Experiment, Analytics,     */
-/*  Compare, AI Insights, Reports. Uses the tokens from styles.css.    */
+/*  AI Insights, Reports. Uses the tokens from styles.css.             */
 /* ================================================================== */
 a.brand { color: var(--text); text-decoration: none; }
 .side-note { font-size: 10.5px; color: var(--muted); line-height: 1.5; padding: 8px 10px; border-top: 1px solid var(--border); }
@@ -236,7 +236,7 @@ th.a, th.b, .ab-head .a, .ab-head .b { color: var(--slot); }
 .ab-pill.fail { color: #fca5a5; }
 .tile-headline { font-family: var(--mono); font-size: 11.5px; color: var(--text); display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
 .tile-actions { display: flex; gap: 8px; margin-top: auto; padding-top: 4px; }
-.flow { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 8px; }
+.flow { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; }
 .flow-step {
   display: flex; flex-direction: column; gap: 4px; text-align: left; padding: 10px; border-radius: var(--radius); cursor: pointer;
   border: 1px solid var(--border); background: var(--surface); color: var(--text);

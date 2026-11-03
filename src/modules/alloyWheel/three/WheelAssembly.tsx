@@ -25,6 +25,7 @@ import {
   vehicleGeometries,
 } from './wheelGeometry';
 import type { FlattenUniforms } from './wheelGeometry';
+import { CorneringRigRotating, MomentArrow, RadialDrum } from './RigHardware';
 
 export interface AssemblyProps {
   overlay: boolean;
@@ -32,6 +33,8 @@ export interface AssemblyProps {
   exploded: boolean;
   showTyre: boolean;
   showLoads: boolean;
+  /** Bench test in place of the road, or null on the road. */
+  rig: 'rig-cornering' | 'rig-radial' | null;
 }
 
 /** Section A-A: keep the half with z ≥ 0 and look at it from −Z, so outboard is on the left as on the drawing. */
@@ -179,7 +182,7 @@ function Cap({ m, explode }: { m: Mats; explode: MutableRefObject<number> }) {
   );
 }
 
-function Road({ flatten }: { flatten: FlattenUniforms }) {
+function Road({ flatten, hidden }: { flatten: FlattenUniforms; hidden: boolean }) {
   const sim = useWheelSim();
   const tex = useMemo(makeRoadTextures, []);
   const shadow = useMemo(makeShadowTexture, []);
@@ -197,7 +200,7 @@ function Road({ flatten }: { flatten: FlattenUniforms }) {
     tex.map.offset.y = s.distanceM % 1;
   });
   return (
-    <group ref={road}>
+    <group ref={road} visible={!hidden}>
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0.05, 0, 0]}>
         <planeGeometry args={[1.5, 6]} />
         <meshStandardMaterial map={tex.map} alphaMap={tex.alpha} transparent roughness={0.95} metalness={0} depthWrite={false} />
@@ -308,7 +311,9 @@ function LoadArrows() {
 /* ------------------------------------------------------------------ */
 /*  The assembly                                                       */
 /* ------------------------------------------------------------------ */
-export function WheelAssembly({ overlay, section, exploded, showTyre, showLoads }: AssemblyProps) {
+export function WheelAssembly({ overlay, section, exploded, showTyre: tyreOn, showLoads, rig }: AssemblyProps) {
+  // The cornering rig runs the bare wheel: no tyre.
+  const showTyre = tyreOn && rig !== 'rig-cornering';
   const sim = useWheelSim();
   const clock = useBuildClock();
   const flatten = useMemo<FlattenUniforms>(() => ({ uGroundY: { value: -0.33 }, uDefl: { value: 0 } }), []);
@@ -385,12 +390,15 @@ export function WheelAssembly({ overlay, section, exploded, showTyre, showLoads 
           <mesh geometry={geo.vehicle.hat} material={m.rotor} />
           <mesh geometry={geo.vehicle.rotor} material={m.rotor} />
         </group>
+        {rig === 'rig-cornering' && <CorneringRigRotating />}
         <group ref={tyre}>
           {showTyre && <mesh geometry={geo.tyre} material={m.tyre} />}
         </group>
       </group>
       <mesh geometry={geo.vehicle.stub} material={m.vehicle} />
-      <Road flatten={flatten} />
+      <Road flatten={flatten} hidden={!!rig} />
+      {rig === 'rig-radial' && <RadialDrum />}
+      {rig === 'rig-cornering' && <MomentArrow />}
       {showLoads && <LoadArrows />}
     </group>
   );

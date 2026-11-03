@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Badge, NumberInput, Panel, SliderField, Tabs, fmt } from '../../../ui/primitives';
 import type { BadgeKind } from '../../../ui/primitives';
 import { useWheelSnapshot } from '../sim/useWheelSim';
-import { LOOP_SCRIPT, MODEL } from '../sim/wheelModel';
+import { LOOP_SCRIPT, MODEL, isRig } from '../sim/wheelModel';
 import type { Scenario } from '../sim/wheelModel';
 import { DESIGN_SPECS, DRAWING_DESIGN, drawingTable } from '../wheel/drawing';
 import type { Provenance } from '../wheel/drawing';
@@ -26,6 +26,11 @@ export const SCENARIOS: { id: Scenario; label: string }[] = [
   { id: 'cornering', label: 'Steady right turn (this wheel outside)' },
   { id: 'brake-stop', label: 'Brake to a stop' },
   { id: 'manual', label: 'Manual: drive it yourself' },
+];
+
+export const RIGS: { id: Scenario; label: string }[] = [
+  { id: 'rig-cornering', label: 'Cornering fatigue: rotating bending moment' },
+  { id: 'rig-radial', label: 'Radial fatigue: tyre on a drum' },
 ];
 
 export const provenanceBadge = (p: Provenance): { kind: BadgeKind; label?: string } =>
@@ -56,11 +61,20 @@ export function WheelParametersPanel() {
           <div className="field" style={{ paddingTop: 0 }}>
             <span className="field-label">Manoeuvre</span>
             <select className="select" value={p.scenario} onChange={(e) => sim.setParams({ scenario: e.target.value as Scenario })}>
-              {SCENARIOS.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.label}
-                </option>
-              ))}
+              <optgroup label="On the road">
+                {SCENARIOS.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.label}
+                  </option>
+                ))}
+              </optgroup>
+              <optgroup label="Test rig">
+                {RIGS.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.label}
+                  </option>
+                ))}
+              </optgroup>
             </select>
             {p.scenario === 'handling-loop' && (
               <div className="hint">
@@ -69,6 +83,10 @@ export function WheelParametersPanel() {
             )}
           </div>
           {p.scenario === 'manual' && <ManualControls />}
+          {isRig(p.scenario) ? (
+            <RigControls />
+          ) : (
+          <>
           <SliderField
             label="Cruise speed"
             hint="The driver returns to this between manoeuvres"
@@ -93,6 +111,8 @@ export function WheelParametersPanel() {
           />
           <SliderField label="Tyre pressure" value={p.tyrePressureBar} min={1.6} max={3.6} step={0.05} digits={2} unit="bar" onChange={(v) => sim.setParams({ tyrePressureBar: v })} />
           <SliderField label="Road grip μ" hint="Friction-circle limit on the tyre forces" value={p.roadMu} min={0.2} max={1.3} step={0.05} digits={2} onChange={(v) => sim.setParams({ roadMu: v })} />
+          </>
+          )}
         </>
       )}
 
@@ -145,6 +165,88 @@ export function WheelParametersPanel() {
         </>
       )}
     </Panel>
+  );
+}
+
+/** Bench tests. The loads come from the test formulas; the factors are assumptions to set from your own standard. */
+function RigControls() {
+  const sim = useWheelSnapshot();
+  const p = sim.params;
+  const cornering = p.scenario === 'rig-cornering';
+  const fv = (
+    <SliderField
+      label="Rated wheel load Fv"
+      hint={<><Badge kind="demo" /> maximum static load the wheel is rated for</>}
+      value={p.staticLoadN}
+      min={2500}
+      max={8000}
+      step={50}
+      unit="N"
+      onChange={(v) => sim.setParams({ staticLoadN: v })}
+    />
+  );
+  const target = cornering ? p.rigTargetCornering : p.rigTargetRadial;
+  return (
+    <>
+      <div className="note amber">
+        {cornering ? (
+          <>
+            The wheel is bolted to a rotating shaft with no tyre, and a constant moment{' '}
+            <b>M = (μ·R + d)·Fv·S = {fmt(sim.rigMoment, 0)} N·m</b> is applied through the hub, so every spoke is fully
+            reversed once per turn. R = {fmt(sim.rigTyreRadius * 1000, 0)} mm static loaded radius, d = ET 58 mm.
+          </>
+        ) : (
+          <>
+            The tyred wheel is pressed onto a rotating drum with <b>Fr = K·Fv = {fmt(sim.rigRadialLoad / 1000, 2)} kN</b>
+            . No lateral or drive force.
+          </>
+        )}{' '}
+        The test form follows common wheel-standard practice; the factors are <b>assumptions</b>, not taken from a
+        standard.
+      </div>
+      {fv}
+      {cornering ? (
+        <>
+          <SliderField label="Friction coefficient μ" hint={<><Badge kind="assumed" /> sizes the lateral force in the moment</>} value={p.rigMu} min={0.5} max={1.1} step={0.05} digits={2} onChange={(v) => sim.setParams({ rigMu: v })} />
+          <SliderField label="Test factor S" hint={<><Badge kind="assumed" /> accelerated-test multiplier</>} value={p.rigS} min={1} max={2.5} step={0.05} digits={2} onChange={(v) => sim.setParams({ rigS: v })} />
+        </>
+      ) : (
+        <>
+          <SliderField label="Load factor K" hint={<><Badge kind="assumed" /> Fr = K·Fv</>} value={p.rigK} min={1.5} max={3} step={0.05} digits={2} onChange={(v) => sim.setParams({ rigK: v })} />
+          <SliderField label="Tyre pressure" value={p.tyrePressureBar} min={1.6} max={4.5} step={0.05} digits={2} unit="bar" onChange={(v) => sim.setParams({ tyrePressureBar: v })} />
+        </>
+      )}
+      <div className="field">
+        <span className="field-label">
+          Target cycles
+          <small>
+            <Badge kind="assumed" /> what the wheel must survive; set it from your standard
+          </small>
+        </span>
+        <div className="seg" style={{ width: '100%' }}>
+          {[5e4, 1e5, 2e5, 5e5, 1e6].map((n) => (
+            <button
+              key={n}
+              style={{ flex: 1 }}
+              className={target === n ? 'active' : ''}
+              onClick={() => sim.setParams(cornering ? { rigTargetCornering: n } : { rigTargetRadial: n })}
+            >
+              {n >= 1e6 ? `${n / 1e6}M` : `${n / 1e3}k`}
+            </button>
+          ))}
+        </div>
+      </div>
+      <SliderField
+        label="Rig speed"
+        hint="Equivalent road speed; sets how fast cycles accumulate, not the stress"
+        value={p.targetSpeedKmh}
+        min={10}
+        max={120}
+        step={1}
+        unit="km/h"
+        onChange={(v) => sim.setParams({ targetSpeedKmh: v })}
+      />
+    </>
   );
 }
 

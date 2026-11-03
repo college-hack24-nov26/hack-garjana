@@ -6,8 +6,8 @@ import { useEffect, useState } from 'react';
  * overkill.
  *
  *   #/dashboard   #/design-lab   #/experiment   #/digital-twin/brake-caliper
- *   #/analytics   #/compare      #/ai-insights  #/digital-twin/spark-plug
- *   #/reports                                   #/digital-twin/alloy-wheel
+ *   #/analytics   #/ai-insights  #/digital-twin/spark-plug
+ *   #/reports                    #/digital-twin/alloy-wheel
  *
  * The older links #/brake-caliper and #/spark-plug still open the Digital Twin pages.
  */
@@ -17,7 +17,6 @@ export type SectionId =
   | 'experiment'
   | 'digital-twin'
   | 'analytics'
-  | 'compare'
   | 'ai-insights'
   | 'reports';
 
@@ -35,7 +34,6 @@ export const SECTIONS: { id: SectionId; label: string; icon: string }[] = [
   { id: 'experiment', label: 'Experiment', icon: '◷' },
   { id: 'digital-twin', label: 'Digital Twin', icon: '◉' },
   { id: 'analytics', label: 'Analytics', icon: '▤' },
-  { id: 'compare', label: 'Compare', icon: '⇄' },
   { id: 'ai-insights', label: 'AI Insights', icon: '✦' },
   { id: 'reports', label: 'Reports', icon: '▥' },
 ];

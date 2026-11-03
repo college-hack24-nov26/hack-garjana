@@ -1,5 +1,6 @@
 import { SECTIONS, navigate } from '../app/routes';
 import type { SectionId } from '../app/routes';
+import { getWheelLab } from '../modules/alloyWheel/lab/WheelLabStore';
 import { Badge, Panel, fmt } from '../ui/primitives';
 import { estimatesFor } from '../workspace/metrics';
 import { VERDICT_LABEL } from '../workspace/validation';
@@ -12,7 +13,6 @@ const FLOW: { id: SectionId; what: string }[] = [
   { id: 'experiment', what: 'Run both through the same test' },
   { id: 'digital-twin', what: 'Watch the part work, live' },
   { id: 'analytics', what: 'Sweeps and sensitivities' },
-  { id: 'compare', what: 'A vs B, side by side' },
   { id: 'ai-insights', what: 'Rule-based findings' },
   { id: 'reports', what: 'Export the evidence' },
 ];
@@ -21,7 +21,11 @@ const MATURITY: { what: string; status: string; kind: 'ok' | 'partial' | 'none' 
   { what: 'Geometry', status: 'Parametric, generated in code from the design inputs', kind: 'ok' },
   { what: 'Motion and dynamics', status: 'Simplified illustrative models (slider-crank, lumped brake)', kind: 'partial' },
   { what: 'Stress, opening, tip temperature', status: 'Reduced-order hand-calculation estimates', kind: 'partial' },
-  { what: 'Finite-element solver', status: 'Not connected in this build', kind: 'none' },
+  {
+    what: 'Finite-element solver',
+    status: 'Backend studies (CadQuery, Gmsh, scikit-fem) from the Experiment page when the backend is online. Solver checked against an analytical cantilever benchmark (numerical verification only); not validated against physical test data',
+    kind: 'partial',
+  },
   { what: 'Physical test data', status: 'None: nothing here is validated against measurements', kind: 'none' },
 ];
 
@@ -48,16 +52,16 @@ export function DashboardPage() {
         </div>
         <div className="hero-actions">
           <button className="btn primary" onClick={() => navigate({ section: 'design-lab' })}>
-            ○ Open Design Lab
+            Open Design Lab
           </button>
           <button className="btn" onClick={() => navigate({ section: 'digital-twin', module: 'brake-caliper' })}>
-            ◉ Brake caliper twin
+            Brake caliper twin
           </button>
           <button className="btn" onClick={() => navigate({ section: 'digital-twin', module: 'spark-plug' })}>
-            ◉ Spark plug twin
+            Spark plug twin
           </button>
           <button className="btn" onClick={() => navigate({ section: 'digital-twin', module: 'alloy-wheel' })}>
-            ◉ Alloy wheel twin
+            Alloy wheel twin
           </button>
         </div>
       </section>
@@ -110,6 +114,7 @@ export function DashboardPage() {
               : ''
           }
           onDesign={() => {
+            getWheelLab().setActive(false);
             ws.setComponent('brake-caliper');
             navigate({ section: 'design-lab' });
           }}
@@ -127,6 +132,7 @@ export function DashboardPage() {
               : ''
           }
           onDesign={() => {
+            getWheelLab().setActive(false);
             ws.setComponent('spark-plug');
             navigate({ section: 'design-lab' });
           }}
@@ -145,11 +151,20 @@ export function DashboardPage() {
             <Badge kind="drawing" /> Ø520 × 256 · 5 Y-spokes · 5× Ø10 on 72°
           </div>
           <div className="tile-headline">
-            <Badge kind="estimated" /> Twin only: Design Lab and Experiment don&apos;t model the wheel yet
+            <Badge kind="estimated" /> Design Lab A/B with rig tests · not yet in Experiment
           </div>
           <div className="tile-actions">
-            <button className="btn sm primary" onClick={() => navigate({ section: 'digital-twin', module: 'alloy-wheel' })}>
-              ◉ Digital Twin
+            <button
+              className="btn sm primary"
+              onClick={() => {
+                getWheelLab().setActive(true);
+                navigate({ section: 'design-lab' });
+              }}
+            >
+              Design Lab
+            </button>
+            <button className="btn sm" onClick={() => navigate({ section: 'digital-twin', module: 'alloy-wheel' })}>
+              Digital Twin
             </button>
           </div>
         </div>
@@ -237,10 +252,10 @@ function ComponentTile(props: {
       </div>
       <div className="tile-actions">
         <button className="btn sm primary" onClick={props.onDesign}>
-          ○ Design Lab
+          Design Lab
         </button>
         <button className="btn sm" onClick={props.onTwin}>
-          ◉ Digital Twin
+          Digital Twin
         </button>
       </div>
     </div>

@@ -126,6 +126,7 @@ export const api = {
 
   listProjects: () => get<Project[]>('/projects'),
   createProject: (name: string, description?: string) => post<Project>('/projects', { name, description }),
+  component: (id: string) => get<ComponentInstance>(`/components/${id}`),
   listComponents: (projectId: string) => get<ComponentInstance[]>(`/projects/${projectId}/components`),
   createComponent: (body: { project_id: string; component_type: ComponentType; design_mode: string; name: string }) =>
     post<ComponentInstance>('/components', body),

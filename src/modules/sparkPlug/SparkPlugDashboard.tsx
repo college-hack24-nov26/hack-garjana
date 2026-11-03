@@ -13,6 +13,8 @@ import { EngineTelemetryPanel } from './components/EngineTelemetryPanel';
 import { ENGINE_VIEWS, EngineCanvas } from './three/EngineCanvas';
 import type { EngineView } from './three/EngineCanvas';
 import { A_COLOUR, B_COLOUR } from './three/EngineScene';
+import { ViewportInfo } from '../../ui/ViewportInfo';
+import { TwinWorkspace } from '../../ui/TwinWorkspace';
 
 /** One EngineSim for the whole session, so it survives switching modules. */
 let sharedSim: EngineSim | null = null;
@@ -183,7 +185,7 @@ function Body({ moduleSwitch, onRunningChange }: DashboardProps) {
         </Panel>
       </div>
 
-      <div className="workspace">
+      <TwinWorkspace>
         <EngineParametersPanel />
 
         <div className="viewport">
@@ -196,7 +198,7 @@ function Body({ moduleSwitch, onRunningChange }: DashboardProps) {
             plug={p.plug}
             combustion={p.showCombustion}
           />
-          <div className="vp-info">
+          <ViewportInfo>
             <div className="t">Split-plug A/B arrangement — one engine, identical operating conditions</div>
             <div className="d">
               Plug A: cyl 1 &amp; 4 · Plug B: cyl 2 &amp; 3 · <span style={{ color: A_COLOUR }}>■ A</span>{' '}
@@ -208,7 +210,7 @@ function Body({ moduleSwitch, onRunningChange }: DashboardProps) {
               Engine geometry is illustrative context. Tip colour = entered tip temperature.
               {p.showCombustion && ' Fire = visual combustion envelope, not a heat-release model.'}
             </div>
-          </div>
+          </ViewportInfo>
           <div className="vp-readout">
             <div className="r">
               θ {fmt(s.crankDeg, 1)}° / 720 · {fmt(p.rpm, 0)} rpm
@@ -265,7 +267,7 @@ function Body({ moduleSwitch, onRunningChange }: DashboardProps) {
         </div>
 
         <EngineTelemetryPanel />
-      </div>
+      </TwinWorkspace>
 
       <div className="charts">
         <LineChart

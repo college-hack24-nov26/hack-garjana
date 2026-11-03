@@ -1,6 +1,6 @@
 /**
  * The A/B estimate table for whichever component is selected. Design Lab,
- * Compare, AI Insights and Reports all read it from here, so every page shows
+ * AI Insights and Reports all read it from here, so every page shows
  * the same numbers.
  */
 import {

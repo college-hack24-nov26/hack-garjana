@@ -7,8 +7,8 @@ import type { AnyDesign } from '../insights/designAccess';
 import { utilisation } from '../insights/findings';
 import type { Finding, InsightContext, Recommendation } from '../insights/types';
 import { useInsights } from '../insights/useInsights';
-import { ChatPanel } from '../insights/chat/ChatPanel';
-import { activeChatProvider, chatStore } from '../insights/chat/instance';
+import { ChatPanel, ChatProviderChip } from '../insights/chat/ChatPanel';
+import { chatStore } from '../insights/chat/instance';
 import { describePatch } from '../insights/chat/optimizer';
 import type { Patch } from '../insights/chat/optimizer';
 import { FocusViewer } from '../insights/focus/FocusViewer';
@@ -158,7 +158,7 @@ export function AIInsightsPage() {
         >
           <FocusViewer spec={spec} src={ws} />
         </Panel>
-        <Panel title="Ask AutoTwin" right={<span className="chip">{activeChatProvider().label}</span>}>
+        <Panel title="Ask AutoTwin" right={<ChatProviderChip />}>
           <ChatPanel
             ctx={ctx}
             src={ws}

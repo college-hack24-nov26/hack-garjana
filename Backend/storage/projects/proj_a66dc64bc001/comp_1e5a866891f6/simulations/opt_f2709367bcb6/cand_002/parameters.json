@@ -1,0 +1,17 @@
+{
+  "parameters": {
+    "thread_major_diameter_m": 0.014,
+    "thread_reach_m": 0.0175,
+    "electrode_gap_m": 0.0008,
+    "electrode_protrusion_m": 0.002,
+    "shell_length_m": 0.022,
+    "insulator_total_length_m": 0.044,
+    "insulator_nose_length_m": 0.014276240749025029,
+    "insulator_diameter_m": 0.00791594577788428,
+    "center_electrode_diameter_m": 0.002104220238877785,
+    "electrode_length_m": 0.020182495186276652
+  },
+  "generator": "spark_plug_parametric",
+  "generator_version": "1.0.0",
+  "geometry_hash": "8c97d0640be717a4b8712c4358792064"
+}

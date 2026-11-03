@@ -1,0 +1,486 @@
+{
+  "manifest_version": "1.0",
+  "generated_at": "2026-11-03T11:16:42.093644+00:00",
+  "study": {
+    "optimization_run_id": "opt_2f0eefc351de",
+    "algorithm": "seeded Latin-hypercube design of experiments",
+    "random_seed": 20261102
+  },
+  "component": {
+    "type": "spark_plug",
+    "display_name": "Spark Plug",
+    "design_mode": "generate_new"
+  },
+  "subject": {
+    "candidate_id": "cand_e9a92c19f6d3",
+    "step_artifact": "C:\\Users\\Sarthak\\Desktop\\phaltan\\storage\\projects\\proj_ace05e55e6b7\\comp_5d99afe29d2f\\simulations\\opt_2f0eefc351de\\cand_003\\design.step"
+  },
+  "identity": {
+    "requirement_revision": "bee9f070428e2884",
+    "geometry_hash": "aae3419e91610a7e4f3681f0a25dfb9a",
+    "material_snapshot_hash": "44a7126367619c3fcd3a428d5d6fa92f",
+    "load_case_hash": "1718475b92b4a2f0a3753d84e40f1cad",
+    "mesh_hash": "173b1addf8604baee9e6c6acb92dbc99",
+    "solver_input_hash": "202f7a10b41186bd86dd3375b57c6eff",
+    "solver_name": "scikit-fem steady-state conduction (quadratic tetrahedra)",
+    "solver_version": "skfem-12.0.2",
+    "generator_version": "1.0.0",
+    "code_commit": null,
+    "staleness_rule": "If any identity value above differs from the current state, every result in this manifest is stale and must be re-derived."
+  },
+  "maturity": {
+    "level": "simulation_evaluated",
+    "statement": "Simulation-evaluated candidate (Level 1)",
+    "intended_use_domain": "Comparative thermal screening of firing-end geometries under a declared convective boundary condition. Not an engine operating point, and not a combustion-coupled heat flux. Ladder rung S1.",
+    "last_evidence_date": "2026-11-03",
+    "blocked_from": "numerically_verified",
+    "blocking_reasons": [
+      "one or more assurance checks failed",
+      "the decision metric moved materially when the mesh was refined"
+    ],
+    "derivation": "Derived deterministically from the recorded checks below. No language model assigns or raises this level."
+  },
+  "verification": {
+    "status": "failed",
+    "benchmark_id": "bar_1d_steady_state_conduction",
+    "reaction_balance_error": null,
+    "energy_balance_error": 3.389384050777292e-13,
+    "checks": [
+      {
+        "check_id": "unit_consistency",
+        "stage": "pre_solver",
+        "status": "passed",
+        "measured": 8.0,
+        "threshold": null,
+        "unit": null
+      },
+      {
+        "check_id": "dimensional_plausibility",
+        "stage": "pre_solver",
+        "status": "passed",
+        "measured": 0.046,
+        "threshold": null,
+        "unit": "m"
+      },
+      {
+        "check_id": "material_completeness",
+        "stage": "pre_solver",
+        "status": "passed",
+        "measured": 4.0,
+        "threshold": null,
+        "unit": null
+      },
+      {
+        "check_id": "geometry_integrity",
+        "stage": "pre_solver",
+        "status": "passed",
+        "measured": 3.7633096736343666e-06,
+        "threshold": null,
+        "unit": "m3"
+      },
+      {
+        "check_id": "interface_invariance",
+        "stage": "pre_solver",
+        "status": "passed",
+        "measured": 1.734723475976807e-18,
+        "threshold": 0.0003,
+        "unit": "m"
+      },
+      {
+        "check_id": "semantic_region_mapping",
+        "stage": "pre_solver",
+        "status": "passed",
+        "measured": 3.0,
+        "threshold": null,
+        "unit": null
+      },
+      {
+        "check_id": "force_path_declaration",
+        "stage": "pre_solver",
+        "status": "not_applicable",
+        "measured": null,
+        "threshold": null,
+        "unit": null
+      },
+      {
+        "check_id": "thermal_boundary_consistency",
+        "stage": "pre_solver",
+        "status": "passed",
+        "measured": 820.0000000000002,
+        "threshold": null,
+        "unit": "K"
+      },
+      {
+        "check_id": "mesh_quality",
+        "stage": "pre_solver",
+        "status": "passed",
+        "measured": 0.2854161638132412,
+        "threshold": 0.1,
+        "unit": null
+      },
+      {
+        "check_id": "mesh_volume_fidelity",
+        "stage": "pre_solver",
+        "status": "passed",
+        "measured": 0.0073780269202382304,
+        "threshold": 0.02,
+        "unit": null
+      },
+      {
+        "check_id": "result_field_integrity",
+        "stage": "post_solver",
+        "status": "passed",
+        "measured": 1017.0,
+        "threshold": null,
+        "unit": null
+      },
+      {
+        "check_id": "decision_metric_present",
+        "stage": "post_solver",
+        "status": "passed",
+        "measured": 1024.3206266247191,
+        "threshold": null,
+        "unit": null
+      },
+      {
+        "check_id": "load_balance",
+        "stage": "post_solver",
+        "status": "not_applicable",
+        "measured": null,
+        "threshold": null,
+        "unit": null
+      },
+      {
+        "check_id": "region_application_coverage",
+        "stage": "post_solver",
+        "status": "passed",
+        "measured": 0.0003160980422940765,
+        "threshold": null,
+        "unit": "m2"
+      },
+      {
+        "check_id": "energy_balance",
+        "stage": "post_solver",
+        "status": "passed",
+        "measured": 3.389384050777292e-13,
+        "threshold": 0.02,
+        "unit": "W"
+      },
+      {
+        "check_id": "linear_solver_residual",
+        "stage": "post_solver",
+        "status": "passed",
+        "measured": 5.453124225401254e-15,
+        "threshold": 1e-06,
+        "unit": null
+      },
+      {
+        "check_id": "benchmark_verification",
+        "stage": "post_solver",
+        "status": "passed",
+        "measured": null,
+        "threshold": null,
+        "unit": null
+      },
+      {
+        "check_id": "mesh_convergence",
+        "stage": "post_solver",
+        "status": "failed",
+        "measured": null,
+        "threshold": 0.1,
+        "unit": null
+      }
+    ],
+    "evidence_gaps": []
+  },
+  "validation": {
+    "status": "not_available",
+    "dataset_id": null,
+    "measurement_basis": null,
+    "predicted": null,
+    "measured": null,
+    "measurement_uncertainty": null,
+    "relative_error": null,
+    "unit": null,
+    "dataset_used_for_calibration": false,
+    "statement": "No physical measurement has been compared against this prediction. Physical validation status is not available, which is distinct from having been validated and distinct from having failed."
+  },
+  "uncertainty": {
+    "numerical_error_sources": [
+      "finite-element discretisation",
+      "iterative linear solve residual"
+    ],
+    "solver_residual": 5.453124225401254e-15,
+    "discretization_sensitivity": null,
+    "model_discrepancy": null,
+    "measurement_uncertainty": null,
+    "stated_prediction_interval": null,
+    "note": "Numerical error is bounded by the recorded residual and the mesh sensitivity. Model discrepancy against a physical part is not quantified, because no physical measurement exists for this model."
+  },
+  "provenance": [
+    {
+      "key": "material.primary",
+      "label": "96 percent alumina technical ceramic (Al2O3) (primary)",
+      "value": 300000000000.0,
+      "unit": "Pa",
+      "source_type": "literature",
+      "source_id": "alumina_96",
+      "source_reference": null,
+      "revision": "1.0.0",
+      "confirmed": false,
+      "uncertainty": null,
+      "note": "Condition: Sintered 96% Al2O3 technical ceramic, as-fired. Illustrative handbook-class value, not supplier-certified."
+    },
+    {
+      "key": "material.electrode",
+      "label": "Nickel-alloy centre-electrode stock (electrode)",
+      "value": 207000000000.0,
+      "unit": "Pa",
+      "source_type": "literature",
+      "source_id": "nickel_alloy_electrode",
+      "source_reference": null,
+      "revision": "1.0.0",
+      "confirmed": false,
+      "uncertainty": null,
+      "note": "Condition: Drawn nickel-alloy electrode wire, as-drawn. Illustrative handbook-class value, not supplier-certified."
+    },
+    {
+      "key": "material.insulator",
+      "label": "96 percent alumina technical ceramic (Al2O3) (insulator)",
+      "value": 300000000000.0,
+      "unit": "Pa",
+      "source_type": "literature",
+      "source_id": "alumina_96",
+      "source_reference": null,
+      "revision": "1.0.0",
+      "confirmed": false,
+      "uncertainty": null,
+      "note": "Condition: Sintered 96% Al2O3 technical ceramic, as-fired. Illustrative handbook-class value, not supplier-certified."
+    },
+    {
+      "key": "material.shell",
+      "label": "Low-carbon steel spark-plug shell stock (shell)",
+      "value": 205000000000.0,
+      "unit": "Pa",
+      "source_type": "literature",
+      "source_id": "steel_low_carbon_shell",
+      "source_reference": null,
+      "revision": "1.0.0",
+      "confirmed": false,
+      "uncertainty": null,
+      "note": "Condition: Cold-formed low-carbon steel bar stock, as-formed. Illustrative handbook-class value, not supplier-certified."
+    },
+    {
+      "key": "thermal.combustion_exposed_surfaces.ambient_temperature",
+      "label": "ambient temperature at combustion_exposed_surfaces",
+      "value": 1446.3000000000002,
+      "unit": "K",
+      "source_type": "user_supplied",
+      "source_id": null,
+      "source_reference": "Combustion-side heat input. Combustion itself is not simulated; this is a convective boundary condition.",
+      "revision": null,
+      "confirmed": true,
+      "uncertainty": null,
+      "note": null
+    },
+    {
+      "key": "thermal.cylinder_head_seat.temperature",
+      "label": "temperature at cylinder_head_seat",
+      "value": 696.3,
+      "unit": "K",
+      "source_type": "user_supplied",
+      "source_id": null,
+      "source_reference": "Thread and seat held at the cylinder-head temperature, assuming ideal thermal contact.",
+      "revision": null,
+      "confirmed": true,
+      "uncertainty": null,
+      "note": null
+    },
+    {
+      "key": "thermal.terminal_end_surfaces.ambient_temperature",
+      "label": "ambient temperature at terminal_end_surfaces",
+      "value": 626.3,
+      "unit": "K",
+      "source_type": "user_supplied",
+      "source_id": null,
+      "source_reference": "Convection to air in the plug well.",
+      "revision": null,
+      "confirmed": true,
+      "uncertainty": null,
+      "note": null
+    },
+    {
+      "key": "constraint.heat_range_window",
+      "label": "Firing-end temperature inside the heat-range window",
+      "value": 1396.3000000000002,
+      "unit": "K",
+      "source_type": "user_supplied",
+      "source_id": null,
+      "source_reference": "Self-cleaning and pre-ignition limits supplied in engineering setup",
+      "revision": null,
+      "confirmed": true,
+      "uncertainty": null,
+      "note": null
+    },
+    {
+      "key": "constraint.manufacturing_min_wall",
+      "label": "Minimum manufacturable section",
+      "value": 0.001,
+      "unit": "mm",
+      "source_type": "demo_assumption",
+      "source_id": null,
+      "source_reference": "Illustrative minimum section for the ceramic insulator wall and shell wall",
+      "revision": null,
+      "confirmed": false,
+      "uncertainty": null,
+      "note": null
+    },
+    {
+      "key": "assumption.combustion_boundary_demo_fixture",
+      "label": "The default thermal load - 900 C gas at a 500 W/(m\u00b2\u00b7K) film coefficient on the firing end - is a demonstration fixture. Real values depend on the engine, the operating point and the duty cycle. The film coefficient in particular is the most uncertain input in this model and the computed temperatures scale strongly with it.",
+      "value": null,
+      "unit": "-",
+      "source_type": "demo_assumption",
+      "source_id": null,
+      "source_reference": null,
+      "revision": null,
+      "confirmed": false,
+      "uncertainty": null,
+      "note": null
+    },
+    {
+      "key": "assumption.steady_state_only",
+      "label": "This is a steady-state solution: it represents a sustained operating condition, not a warm-up, a transient load change or any part of the engine cycle. Cyclic peak surface temperatures are higher than a steady-state average.",
+      "value": null,
+      "unit": "-",
+      "source_type": "demo_assumption",
+      "source_id": null,
+      "source_reference": null,
+      "revision": null,
+      "confirmed": false,
+      "uncertainty": null,
+      "note": null
+    },
+    {
+      "key": "assumption.head_temperature_demo_fixture",
+      "label": "The 150 C default cylinder-head seat temperature is a demonstration fixture and is applied as a fixed temperature, which assumes the head is an ideal sink with no contact resistance at the seat.",
+      "value": null,
+      "unit": "-",
+      "source_type": "demo_assumption",
+      "source_id": null,
+      "source_reference": null,
+      "revision": null,
+      "confirmed": false,
+      "uncertainty": null,
+      "note": null
+    },
+    {
+      "key": "assumption.heat_range_window_demo_fixture",
+      "label": "The 450 C to 850 C operating window is the commonly cited self-cleaning to pre-ignition range for a spark plug firing end. It is entered here as a demonstration fixture, not as a specification from a plug or engine manufacturer. Confirm the window that applies to your application.",
+      "value": null,
+      "unit": "-",
+      "source_type": "demo_assumption",
+      "source_id": null,
+      "source_reference": null,
+      "revision": null,
+      "confirmed": false,
+      "uncertainty": null,
+      "note": null
+    },
+    {
+      "key": "assumption.perfect_interfaces",
+      "label": "The shell, insulator and electrode are modelled as perfectly bonded, so no contact thermal resistance is included at their interfaces. Real assemblies have some resistance, which would raise the computed firing-end temperature.",
+      "value": null,
+      "unit": "-",
+      "source_type": "demo_assumption",
+      "source_id": null,
+      "source_reference": null,
+      "revision": null,
+      "confirmed": false,
+      "uncertainty": null,
+      "note": null
+    },
+    {
+      "key": "assumption.geometry_simplification",
+      "label": "Simplified three-part spark-plug thermal template: centre electrode, ceramic insulator and metal shell as concentric solids of revolution with perfectly conducting interfaces. The hex, terminal, ground electrode arm, internal resistor, seals, gasket, thread form and precious-metal tips are not modelled. Thread major diameter, reach, seat position and electrode gap are preserved interfaces and cannot be changed by the optimizer.",
+      "value": null,
+      "unit": "-",
+      "source_type": "demo_assumption",
+      "source_id": null,
+      "source_reference": null,
+      "revision": null,
+      "confirmed": false,
+      "uncertainty": null,
+      "note": null
+    }
+  ],
+  "validation_ladder": {
+    "title": "Spark plug thermal validation ladder",
+    "attained_level": "S1",
+    "rungs": [
+      {
+        "level": "S0",
+        "capability": "One-dimensional thermal resistance network.",
+        "evidence_required": "Hand-checkable temperature drops, heat flow and a closed energy balance.",
+        "release_label": "Numerically verified solver path.",
+        "attained": true,
+        "gap": null
+      },
+      {
+        "level": "S1",
+        "capability": "Three-dimensional steady conduction through shell, insulator and electrodes, with per-material conductivity.",
+        "evidence_required": "Material and interface provenance, boundary-condition provenance, a mesh study and a closed energy balance.",
+        "release_label": "Simulation evaluated under a declared reduced thermal model.",
+        "attained": true,
+        "gap": null
+      },
+      {
+        "level": "S2",
+        "capability": "Engine-coupled or cycle-averaged heat input.",
+        "evidence_required": "A stated operating point, a crank-angle or heat-flux model, and justification for the cycle averaging.",
+        "release_label": "Operating-point thermal model.",
+        "attained": false,
+        "gap": "The firing-end boundary is a declared convective film condition, not a combustion-derived heat flux. No engine operating point is represented, so the absolute temperature level is model-specific."
+      },
+      {
+        "level": "S3",
+        "capability": "Instrumented plug or engine test.",
+        "evidence_required": "Sensor location, type and calibration, stated engine conditions and an independent validation dataset.",
+        "release_label": "Validated only for the tested operating points.",
+        "attained": false,
+        "gap": "No thermocouple data. The published combustion-coupled work needed heat-transfer-coefficient tuning against measurement to reach \u00b110%, which this model has not had."
+      },
+      {
+        "level": "S4",
+        "capability": "Electrode erosion, oxidation and interface degradation.",
+        "evidence_required": "Specialist multiphysics coupling plus microscopy, wear or erosion comparison.",
+        "release_label": "Degradation prediction validated only within the tested domain.",
+        "attained": false,
+        "gap": "Steady conduction cannot represent arc discharge, plasma energy transfer or material ablation. This is a different physics path, not a refinement of S1."
+      }
+    ]
+  },
+  "fidelity_level": "F2",
+  "unresolved_limitations": [
+    "S2 not attained: The firing-end boundary is a declared convective film condition, not a combustion-derived heat flux. No engine operating point is represented, so the absolute temperature level is model-specific.",
+    "No physical measurement has been compared against this prediction. Physical validation status is not available, which is distinct from having been validated and distinct from having failed."
+  ],
+  "prohibited_claims": [
+    "Production-ready automotive CAE",
+    "Certified, compliant or homologated to any standard",
+    "Fatigue life validated",
+    "Real-time or operational digital twin",
+    "Calibrated component twin",
+    "A measured AI accuracy figure",
+    "A percentage cost or time saving",
+    "Experimentally validated",
+    "Safe for road use",
+    "Guaranteed not to fail"
+  ],
+  "standing_limitations": [
+    "This report contains virtual-prototyping predictions produced under the engineering model recorded below. It is not a regulatory certification, not an approval for road use, and not a substitute for physical validation.",
+    "A candidate marked 'feasible under configured model' satisfied the constraints listed in this report and nothing more.",
+    "Material properties are taken from the catalog snapshot recorded with each run. Where a record is tagged 'illustrative_handbook_value' it is not supplier-certified data and must be replaced before any engineering sign-off.",
+    "Candidates that failed geometry generation, meshing or the solver carry no metrics. They are listed with their failure stage and reason rather than omitted."
+  ]
+}

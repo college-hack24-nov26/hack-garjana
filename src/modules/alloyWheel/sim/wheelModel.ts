@@ -28,7 +28,10 @@ import type { WheelMaterial, WheelMaterialId } from '../wheel/materials.ts';
 import { SPOTS, overturningMoment, revolutionCycle, spokeLoads, spotCoeffs, spotStress, wheelTorque } from './loads.ts';
 import type { ArmLoad, CycleSample, PatchLoads, SpotCoeffs, SpotId } from './loads.ts';
 
-export type Scenario = 'manual' | 'cruise' | 'brake-stop' | 'cornering' | 'handling-loop';
+export type Scenario = 'manual' | 'cruise' | 'brake-stop' | 'cornering' | 'handling-loop' | 'rig-cornering' | 'rig-radial';
+
+/** The two bench tests. They replace the car with a rig, so the vehicle model is bypassed. */
+export const isRig = (s: Scenario): s is 'rig-cornering' | 'rig-radial' => s === 'rig-cornering' || s === 'rig-radial';
 
 export interface WheelParams extends WheelDesign {
   /** Cruise speed the driver returns to, km/h. */
@@ -52,6 +55,15 @@ export interface WheelParams extends WheelDesign {
   playback: number;
   /** When the scripted scenarios start their manoeuvre, s. */
   manoeuvreAtS: number;
+  /** Cornering rig: tyre-road friction used to size the moment (assumed). */
+  rigMu: number;
+  /** Cornering rig: accelerated-test factor S (assumed). */
+  rigS: number;
+  /** Radial rig: load factor K on the rated load (assumed). */
+  rigK: number;
+  /** Cycles the wheel must survive on the selected rig (assumed; set it from your standard). */
+  rigTargetCornering: number;
+  rigTargetRadial: number;
 }
 
 export const DEFAULT_PARAMS: WheelParams = {
@@ -69,6 +81,11 @@ export const DEFAULT_PARAMS: WheelParams = {
   durationS: 36,
   playback: 0.25,
   manoeuvreAtS: 2,
+  rigMu: 0.7,
+  rigS: 1.6,
+  rigK: 2.25,
+  rigTargetCornering: 1e5,
+  rigTargetRadial: 5e5,
 };
 
 /** Fixed model constants. The UI lists these too. */
@@ -95,7 +112,16 @@ export const LOAD_TRANSFER = {
   lat: (2 * MODEL.cgHeight) / MODEL.track,
 };
 
-export type WheelPhase = 'stopped' | 'holding' | 'cruising' | 'accelerating' | 'braking' | 'corner-outer' | 'corner-inner';
+export type WheelPhase =
+  | 'stopped'
+  | 'holding'
+  | 'cruising'
+  | 'accelerating'
+  | 'braking'
+  | 'corner-outer'
+  | 'corner-inner'
+  | 'rig-cornering'
+  | 'rig-radial';
 
 /** The scripted handling loop, one period. */
 export const LOOP_SCRIPT: { from: number; to: number; brake?: boolean; turn?: 1 | -1; label: string }[] = [
@@ -205,7 +231,44 @@ export class WheelSim extends SimStore {
   }
   get patch(): PatchLoads {
     const s = this.state;
-    return { Fz: s.Fz, Fy: s.Fy, Fx: s.Fx, loadedRadius: s.loadedRadius };
+    const appliedMoment = this.params.scenario === 'rig-cornering' ? this.rigMoment : undefined;
+    return { Fz: s.Fz, Fy: s.Fy, Fx: s.Fx, loadedRadius: s.loadedRadius, appliedMoment };
+  }
+
+  // ---------- test rigs ----------
+  /** Static loaded radius of the tyre at the rated load, m. The moment arm in the cornering test. */
+  get rigTyreRadius() {
+    return FIXED.tyreFreeRadius - this.params.staticLoadN / this.tyreStiffness;
+  }
+  /** Cornering-fatigue test moment M = (μ·R + d)·Fv·S, N·m, with d the wheel offset (ET). */
+  get rigMoment() {
+    const p = this.params;
+    return (p.rigMu * this.rigTyreRadius + FIXED.xMount) * p.staticLoadN * p.rigS;
+  }
+  /** Radial-fatigue test load Fr = K·Fv, N. */
+  get rigRadialLoad() {
+    return this.params.rigK * this.params.staticLoadN;
+  }
+  get rigTarget() {
+    return this.params.scenario === 'rig-radial' ? this.params.rigTargetRadial : this.params.rigTargetCornering;
+  }
+  /** Cycles to failure at the current condition (one cycle per turn). Infinity when the damage rate is ~0. */
+  get cyclesToFailure() {
+    return this.state.damagePerRev > 0 ? 1 / this.state.damagePerRev : Infinity;
+  }
+
+  /** Put the rig's loads on the wheel. The rig turns it at the cruise speed (drum surface speed for the radial rig). */
+  private applyRig() {
+    const p = this.params;
+    const s = this.state;
+    s.v = p.targetSpeedKmh / 3.6;
+    s.ax = 0;
+    s.ay = 0;
+    s.Fx = 0;
+    s.Fy = 0;
+    s.gripLimited = false;
+    s.Fz = p.scenario === 'rig-radial' ? this.rigRadialLoad : 0;
+    if (isRig(p.scenario)) s.phase = p.scenario;
   }
 
   // ---------- control ----------
@@ -265,6 +328,7 @@ export class WheelSim extends SimStore {
     this.stopDone = false;
     this.manual = { brake: false, accel: false, turn: 0 };
     this.running = false;
+    if (isRig(this.params.scenario)) this.applyRig();
     this.updateLoads(0);
     this.refreshCycle();
     this.record();
@@ -287,7 +351,17 @@ export class WheelSim extends SimStore {
 
   setParams(patch: Partial<WheelParams>) {
     const idle = this.state.t === 0 && !this.running;
+    const wasRig = isRig(this.params.scenario);
     this.params = { ...this.params, ...patch };
+    // Moving between the road and a rig is a different experiment: start it clean.
+    if (patch.scenario !== undefined && isRig(patch.scenario) !== wasRig) {
+      const running = this.running;
+      if (patch.scenario && isRig(patch.scenario)) this.rebuild();
+      this.reset();
+      if (running) this.play();
+      return;
+    }
+    if (isRig(this.params.scenario)) this.applyRig();
     const geometryKeys: (keyof WheelParams)[] = [
       'spokeCount', 'forkRadiusMm', 'legSpreadMm', 'legWidthMm', 'armWidthMm', 'spokeDepthRimMm', 'blendRadiusMm', 'materialId', 'kt',
     ];
@@ -355,6 +429,8 @@ export class WheelSim extends SimStore {
         const seg = LOOP_SCRIPT.find((x) => tl >= x.from && tl < x.to) ?? LOOP_SCRIPT[0];
         return { brake: !!seg.brake, accel: false, turn: seg.turn ?? 0 };
       }
+      default:
+        return { brake: false, accel: false, turn: 0 }; // rigs: no driver
     }
   }
 
@@ -363,6 +439,14 @@ export class WheelSim extends SimStore {
     const p = this.params;
     const s = this.state;
     const g = MODEL.g;
+    if (isRig(p.scenario)) {
+      this.applyRig();
+      this.updateLoads(dt);
+      s.t += dt;
+      if (s.t >= this.nextCycleT - 1e-9) this.refreshCycle();
+      if (s.t >= this.nextSampleT - 1e-9) this.record();
+      return;
+    }
     const cmd = this.commands();
 
     // 1. Driver: acceleration commands.
@@ -426,7 +510,8 @@ export class WheelSim extends SimStore {
   private updateLoads(dt: number) {
     const s = this.state;
     const p = this.params;
-    s.deflection = s.Fz / this.tyreStiffness;
+    // The cornering rig has no tyre: the wheel is driven through its hub.
+    s.deflection = p.scenario === 'rig-cornering' ? 0 : s.Fz / this.tyreStiffness;
     s.loadedRadius = FIXED.tyreFreeRadius - s.deflection;
     s.effRadius = FIXED.tyreFreeRadius - s.deflection / 3;
     const omegaPrev = s.omega;

@@ -9,6 +9,8 @@ import { ParametersPanel } from './components/ParametersPanel';
 import { TelemetryPanel } from './components/TelemetryPanel';
 import { LineChart } from '../../ui/LineChart';
 import { Badge, Panel, fmt } from '../../ui/primitives';
+import { ViewportInfo } from '../../ui/ViewportInfo';
+import { TwinWorkspace } from '../../ui/TwinWorkspace';
 
 const PHASE_LABEL: Record<string, string> = {
   stopped: 'Stopped',
@@ -185,12 +187,12 @@ function DashboardBody({ moduleSwitch, onRunningChange }: DashboardProps) {
         </Panel>
       </div>
 
-      <div className="workspace">
+      <TwinWorkspace>
         <ParametersPanel />
 
         <div className="viewport">
           <BrakeScene sim={sim} view={view} viewNonce={viewNonce} cutaway={cutaway} showTyre={showTyre} />
-          <div className="vp-info">
+          <ViewportInfo>
             <div className="t">Front corner brake assembly — fixed caliper, rotating wheel + rotor</div>
             <div className="d">
               225/45 R18 · 5-spoke alloy · Ø330×28 mm vented rotor · {p.pistonsPerSide * 2}× Ø{p.pistonDiaMm} mm
@@ -202,7 +204,7 @@ function DashboardBody({ moduleSwitch, onRunningChange }: DashboardProps) {
               Geometry is illustrative · clearance drawn ×{Math.round(CLEARANCE_EXAGGERATION)} (
               {MODEL.runningClearanceMm} mm → {(MODEL.runningClearanceMm * CLEARANCE_EXAGGERATION).toFixed(0)} mm)
             </div>
-          </div>
+          </ViewportInfo>
           <div className="vp-readout">
             <div className="r">
               θ {thetaDeg.toFixed(1).padStart(5, ' ')}° · {fmt(sim.rpm, 0)} rpm · {fmt(s.pressure, 1)} MPa
@@ -244,7 +246,7 @@ function DashboardBody({ moduleSwitch, onRunningChange }: DashboardProps) {
         </div>
 
         <TelemetryPanel />
-      </div>
+      </TwinWorkspace>
 
       <div className="charts">
         <LineChart

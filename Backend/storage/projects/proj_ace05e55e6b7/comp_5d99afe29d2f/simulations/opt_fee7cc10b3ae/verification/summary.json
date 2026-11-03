@@ -1,0 +1,160 @@
+{
+  "result_kind": "steady_state_thermal",
+  "analysis_type": "steady_state_thermal",
+  "solver_name": "scikit-fem steady-state conduction (quadratic tetrahedra)",
+  "solver_version": "skfem-12.0.2",
+  "solve_time_seconds": 13.577550400004839,
+  "degrees_of_freedom": 169397,
+  "summary": {
+    "mass_kg": 0.027255855921653648,
+    "volume_m3": 3.7633096736343666e-6,
+    "max_von_mises_pa": null,
+    "max_displacement_m": null,
+    "compliance_j": null,
+    "min_factor_of_safety": null,
+    "factor_of_safety_basis": null,
+    "max_temperature_k": 1016.8888355596166,
+    "min_temperature_k": 683.8047639084682,
+    "max_temperature_gradient_k_per_m": 122284.28163560275,
+    "heat_flow_w": 35.01681357163726,
+    "min_wall_thickness_m": 0.001036841918516915
+  },
+  "mesh_metadata": {
+    "node_count": 22600,
+    "tet_count": 116831,
+    "boundary_triangle_count": 20068,
+    "target_element_size_m": 0.0005464156910584142,
+    "min_element_size_m": 0.00024588706097628644,
+    "fe_element_order": 2,
+    "gmsh_version": "4.15.2",
+    "quality": {
+      "min_quality": 0.23437941961206313,
+      "mean_quality": 0.823702787575872,
+      "quality_measure": "gamma (inscribed/circumscribed radius ratio)",
+      "poor_element_count": 0,
+      "poor_element_threshold": 0.1
+    },
+    "subdomain_element_counts": {
+      "electrode": 7868,
+      "insulator": 23185,
+      "shell": 85778
+    },
+    "warnings": []
+  },
+  "region_applications": [
+    {
+      "region": "combustion_exposed_surfaces",
+      "role": "thermal:convection",
+      "facet_count": 2675,
+      "area_m2": 0.0003186385940574896,
+      "note": "h = 500 W/(m²·K) to 1173.2 C ambient over 3.19 cm2"
+    },
+    {
+      "region": "cylinder_head_seat",
+      "role": "thermal:fixed_temperature",
+      "facet_count": 6323,
+      "area_m2": 0.0007974406197002747,
+      "note": "temperature held at 423.1 C over 7.97 cm2"
+    },
+    {
+      "region": "terminal_end_surfaces",
+      "role": "thermal:convection",
+      "facet_count": 4137,
+      "area_m2": 0.0005005953282957274,
+      "note": "h = 25 W/(m²·K) to 353.1 C ambient over 5.01 cm2"
+    }
+  ],
+  "load_verifications": [],
+  "field_artifact": {
+    "path": "C:\\Users\\Sarthak\\Desktop\\phaltan\\storage\\projects\\proj_ace05e55e6b7\\comp_5d99afe29d2f\\simulations\\opt_fee7cc10b3ae\\verification\\result_fields_steady_state_operating.npz",
+    "format": "npz",
+    "node_count": 7369,
+    "triangle_count": 14734,
+    "has_displacement": false,
+    "has_stress": false,
+    "has_temperature": true,
+    "stress_location": null,
+    "temperature_location": "nodal",
+    "note": "Boundary surface of the analysis mesh with the nodal steady-state temperature field, in kelvin."
+  },
+  "material_snapshot": {
+    "electrode": {
+      "material_id": "nickel_alloy_electrode",
+      "name": "Nickel-alloy centre-electrode stock",
+      "family": "nickel_alloy",
+      "typical_use": "Spark-plug centre and ground electrode",
+      "condition": "Drawn nickel-alloy electrode wire, as-drawn.",
+      "density": 8900.0,
+      "elastic_modulus": 207000000000.0,
+      "poisson_ratio": 0.31,
+      "yield_strength": 148000000.0,
+      "ultimate_tensile_strength": 462000000.0,
+      "thermal_conductivity": 90.7,
+      "specific_heat": 444.0,
+      "max_service_temperature": 1273.15,
+      "source_status": "illustrative_handbook_value",
+      "source_document": null,
+      "notes": null,
+      "temperature_dependent_properties": null,
+      "record_version": "1.0.0",
+      "last_reviewed": "2026-11-02"
+    },
+    "insulator": {
+      "material_id": "alumina_96",
+      "name": "96 percent alumina technical ceramic (Al2O3)",
+      "family": "technical_ceramic",
+      "typical_use": "Spark-plug insulator",
+      "condition": "Sintered 96% Al2O3 technical ceramic, as-fired.",
+      "density": 3720.0,
+      "elastic_modulus": 300000000000.0,
+      "poisson_ratio": 0.21,
+      "yield_strength": null,
+      "ultimate_tensile_strength": 193000000.0,
+      "thermal_conductivity": 24.7,
+      "specific_heat": 880.0,
+      "max_service_temperature": 1973.15,
+      "source_status": "illustrative_handbook_value",
+      "source_document": null,
+      "notes": "Brittle ceramic: no yield point is defined, so a structural factor of safety against yield is not computed for this material. The thermal properties are the ones used by the spark-plug profile.",
+      "temperature_dependent_properties": null,
+      "record_version": "1.0.0",
+      "last_reviewed": "2026-11-02"
+    },
+    "shell": {
+      "material_id": "steel_low_carbon_shell",
+      "name": "Low-carbon steel spark-plug shell stock",
+      "family": "carbon_steel",
+      "typical_use": "Spark-plug metal shell (threaded body)",
+      "condition": "Cold-formed low-carbon steel bar stock, as-formed.",
+      "density": 7850.0,
+      "elastic_modulus": 205000000000.0,
+      "poisson_ratio": 0.29,
+      "yield_strength": 250000000.0,
+      "ultimate_tensile_strength": 400000000.0,
+      "thermal_conductivity": 51.9,
+      "specific_heat": 486.0,
+      "max_service_temperature": 873.15,
+      "source_status": "illustrative_handbook_value",
+      "source_document": null,
+      "notes": null,
+      "temperature_dependent_properties": null,
+      "record_version": "1.0.0",
+      "last_reviewed": "2026-11-02"
+    }
+  },
+  "linear_solver_report": {
+    "method": "algebraic multigrid preconditioned conjugate gradient (pyamg)",
+    "unknowns": 156544,
+    "relative_residual": 3.90421008791345e-9,
+    "iterations": 23,
+    "wall_seconds": 7.025571299993317,
+    "fell_back": false,
+    "note": ""
+  },
+  "energy_balance": null,
+  "load_case_id": "steady_state_operating",
+  "warnings": [
+    "Peak computed temperature 744 C exceeds the catalog service limit of: Low-carbon steel spark-plug shell stock (limit 600 C). The conduction solution is still valid, but the material selection is not."
+  ],
+  "method_statement": "3D steady-state Fourier heat-conduction finite-element analysis with 10-node tetrahedra and per-material subdomains, verified against the analytical 1D conduction benchmark. Interfaces between assembled parts are treated as perfectly conducting. It does not model combustion, ignition discharge, cylinder pressure or flow, or any transient engine-cycle behaviour."
+}

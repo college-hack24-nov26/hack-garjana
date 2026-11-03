@@ -38,6 +38,11 @@ export interface PatchLoads {
   Fx: number;
   /** Axle height above the road, m. Lever arm for Fx and Fy. */
   loadedRadius: number;
+  /**
+   * Bending moment applied straight through the hub, N·m (cornering-fatigue rig).
+   * When set it replaces Fz·d + Fy·R.
+   */
+  appliedMoment?: number;
 }
 
 export interface ArmLoad {
@@ -52,7 +57,8 @@ export interface ArmLoad {
 /** cos ψ for spoke i when the wheel has turned through θ (spoke 0 points up at θ = 0). */
 export const spokeCos = (i: number, N: number, theta: number) => -Math.cos((2 * Math.PI * i) / N - theta);
 
-export const overturningMoment = (L: WheelLayout, p: PatchLoads) => p.Fz * L.dOffset + p.Fy * p.loadedRadius;
+export const overturningMoment = (L: WheelLayout, p: PatchLoads) =>
+  p.appliedMoment ?? p.Fz * L.dOffset + p.Fy * p.loadedRadius;
 export const wheelTorque = (p: PatchLoads) => p.Fx * p.loadedRadius;
 
 export function spokeLoads(L: WheelLayout, p: PatchLoads, theta: number, out: ArmLoad[] = []): ArmLoad[] {

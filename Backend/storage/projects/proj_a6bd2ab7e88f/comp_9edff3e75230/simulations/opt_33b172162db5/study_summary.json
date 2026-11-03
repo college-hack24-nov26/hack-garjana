@@ -1,0 +1,240 @@
+{
+  "optimization_run_id": "opt_33b172162db5",
+  "algorithm": "seeded Latin-hypercube design of experiments",
+  "random_seed": 20261102,
+  "termination_reason": "candidate budget of 3 exhausted",
+  "summary": {
+    "candidates_generated": 4,
+    "candidates_evaluated": 2,
+    "candidates_feasible": 0,
+    "candidates_failed": 2,
+    "cache_hits": 0,
+    "total_seconds": 55.03195730000152,
+    "mean_solve_seconds": 26.490228149999894,
+    "max_solve_seconds": 29.25423690000025
+  },
+  "recommendation": {
+    "candidate_id": null,
+    "improves_on_baseline": null,
+    "primary_metric": "mass_kg",
+    "baseline_value": null,
+    "candidate_value": null,
+    "percent_change": null,
+    "statement": "No generated candidate satisfied every configured constraint. 1 candidate(s) were evaluated. Widen the design bounds, relax a constraint that is not a hard requirement, or increase the candidate budget."
+  },
+  "comparison": {},
+  "mesh_convergence": {
+    "performed": false,
+    "coarse_preset": "",
+    "fine_preset": "",
+    "coarse_nodes": null,
+    "fine_nodes": null,
+    "metrics": {},
+    "converged": null,
+    "tolerance": 0.1,
+    "statement": "",
+    "fine_candidate_id": null,
+    "coarse_feasible": null,
+    "fine_feasible": null,
+    "verdict_changed": null,
+    "fine_constraint_results": [],
+    "unconverged_metrics": []
+  },
+  "specification": {
+    "component_type": "brake_caliper",
+    "design_mode": "generate_new",
+    "analysis_type": "linear_static_structural",
+    "unit_system": "SI_canonical",
+    "objective_summary": "Explore caliper bridge, wall and rib proportions that cut unnecessary mass while keeping peak stress and caliper mouth opening inside configured limits and preserving the disc slot, piston bore and mounting interfaces.",
+    "material_id": "al_6061_t6",
+    "material_assignments": {},
+    "parameters": {
+      "body_length_m": 0.13,
+      "disc_slot_width_m": 0.034,
+      "piston_bore_diameter_m": 0.048,
+      "mount_hole_diameter_m": 0.012,
+      "mount_hole_spacing_m": 0.096,
+      "wall_thickness_m": 0.02,
+      "bridge_thickness_m": 0.02,
+      "body_height_m": 0.095,
+      "slot_depth_fraction": 0.62,
+      "rib_count": 2.0,
+      "rib_thickness_m": 0.008
+    },
+    "design_variables": [
+      "wall_thickness_m",
+      "bridge_thickness_m",
+      "body_height_m",
+      "slot_depth_fraction",
+      "rib_count",
+      "rib_thickness_m"
+    ],
+    "load_cases": [
+      {
+        "case_id": "clamping_load",
+        "name": "Clamping load (mouth opening)",
+        "analysis_type": "linear_static_structural",
+        "description": "10.00 MPa hydraulic pressure on the piston bore pocket, with the resulting 18096 N pad reaction (bore area 18.10 cm2 x 1 piston(s)) applied to the outboard pad abutment. Mounting holes fixed.",
+        "loads": [
+          {
+            "type": "pressure",
+            "region": "piston_bore_surfaces",
+            "magnitude": {
+              "value": 10.0,
+              "unit": "MPa"
+            },
+            "note": "Hydraulic pressure acting on the bore pocket wall and base."
+          },
+          {
+            "type": "force",
+            "region": "outboard_pad_abutment",
+            "magnitude": {
+              "value": 18095.57368467721,
+              "unit": "N"
+            },
+            "direction": [
+              0.0,
+              1.0,
+              0.0
+            ],
+            "note": "Outboard pad reaction pushing the outboard leg away from the disc, which is what opens the caliper mouth."
+          }
+        ],
+        "supports": [
+          {
+            "type": "fixed",
+            "region": "mounting_hole_surfaces",
+            "note": "Simplified fixed knuckle mount."
+          }
+        ],
+        "thermal_boundary_conditions": [],
+        "assumptions": []
+      }
+    ],
+    "objectives": [
+      {
+        "objective_id": "minimize_mass",
+        "metric": "mass_kg",
+        "sense": "minimize",
+        "weight": 1.0,
+        "label": "Minimise caliper body mass"
+      },
+      {
+        "objective_id": "minimize_mouth_opening",
+        "metric": "max_displacement_m",
+        "sense": "minimize",
+        "weight": 1.0,
+        "label": "Minimise caliper mouth opening"
+      }
+    ],
+    "constraints": [
+      {
+        "constraint_id": "stress_limit",
+        "metric": "max_von_mises_pa",
+        "operator": "lte",
+        "limit": {
+          "value": 165.0,
+          "unit": "MPa"
+        },
+        "lower": null,
+        "upper": null,
+        "source_status": "user_supplied",
+        "source_reference": "Allowable von Mises stress supplied in engineering setup",
+        "label": "Peak stress within allowable"
+      },
+      {
+        "constraint_id": "mouth_opening_limit",
+        "metric": "max_displacement_m",
+        "operator": "lte",
+        "limit": {
+          "value": 0.15,
+          "unit": "mm"
+        },
+        "lower": null,
+        "upper": null,
+        "source_status": "user_supplied",
+        "source_reference": "Allowable mouth opening supplied in engineering setup",
+        "label": "Mouth opening within allowable"
+      },
+      {
+        "constraint_id": "manufacturing_min_wall",
+        "metric": "min_wall_thickness_m",
+        "operator": "gte",
+        "limit": {
+          "value": 7.0,
+          "unit": "mm"
+        },
+        "lower": null,
+        "upper": null,
+        "source_status": "user_supplied",
+        "source_reference": "Casting minimum wall thickness supplied in engineering setup",
+        "label": "Manufacturable wall thickness"
+      }
+    ],
+    "manufacturing_constraints": [],
+    "mesh_settings": {
+      "target_element_size_m": 0.007612499999999999,
+      "min_element_size_m": 0.0034256249999999994,
+      "element_order": 2,
+      "optimize_quality": true,
+      "max_nodes": 200000
+    },
+    "solver_settings": {
+      "solver_id": "skfem_linear_static",
+      "timeout_seconds": 600,
+      "options": {}
+    },
+    "assumptions": [
+      {
+        "key": "hydraulic_pressure_demo_fixture",
+        "statement": "The 10 MPa default line pressure is a demonstration fixture representing a firm brake application. It is not taken from a vehicle brake-system specification.",
+        "source_status": "demo_fixture",
+        "source_reference": null,
+        "requires_confirmation": true,
+        "confirmed": false
+      },
+      {
+        "key": "clamping_load_model",
+        "statement": "The clamping load is modelled as hydraulic pressure on the piston bore pocket plus an equal and opposite resultant force spread over the outboard pad abutment face. The piston, pads and disc are not modelled, and pad pressure distribution is assumed uniform.",
+        "source_status": "demo_fixture",
+        "source_reference": null,
+        "requires_confirmation": true,
+        "confirmed": false
+      },
+      {
+        "key": "mounting_constraint_simplification",
+        "statement": "The two mounting hole barrels are fully fixed. Bolt pretension, friction and contact separation at the knuckle are not modelled, so stress around the mounting holes is indicative only.",
+        "source_status": "demo_fixture",
+        "source_reference": null,
+        "requires_confirmation": true,
+        "confirmed": false
+      },
+      {
+        "key": "brake_torque_not_modelled",
+        "statement": "Only the clamping (mouth-opening) load case is analysed. The brake torque reaction that acts circumferentially through the mounting bolts is a separate load case and is not included here.",
+        "source_status": "demo_fixture",
+        "source_reference": null,
+        "requires_confirmation": true,
+        "confirmed": false
+      },
+      {
+        "key": "allowable_stress_demo_fixture",
+        "statement": "The 165 MPa default allowable stress is a demonstration value derived as roughly the 250 MPa catalog yield of EN-GJS-400-18 divided by a safety factor of 1.5. The 0.15 mm default mouth opening limit is likewise illustrative. Both are stated so the constraint is active across the design space; replace them with limits from your own design standard and certified material data.",
+        "source_status": "demo_fixture",
+        "source_reference": null,
+        "requires_confirmation": true,
+        "confirmed": false
+      },
+      {
+        "key": "geometry_simplification",
+        "statement": "Simplified fixed-caliper body template: U-shaped channel over the disc, piston bore pocket in the inboard leg, mounting holes through the inboard leg, optional bridge ribs. The hydraulic circuit, seal grooves, pistons, pads, disc, and casting draft are not modelled. Disc slot width, piston bore diameter, mounting hole pattern and body length are preserved interfaces and cannot be changed by the optimizer.",
+        "source_status": "demo_fixture",
+        "source_reference": null,
+        "requires_confirmation": false,
+        "confirmed": false
+      }
+    ],
+    "requested_candidate_budget": 3,
+    "random_seed": 20261102
+  }
+}

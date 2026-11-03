@@ -10,6 +10,8 @@ import { DesignLabPage } from './pages/DesignLabPage';
 import { PendingPage } from './pages/PendingPage';
 import { AIInsightsPage } from './pages/AIInsightsPage';
 import { ExperimentPage } from './pages/ExperimentPage';
+import { AnalyticsPage } from './pages/AnalyticsPage';
+import { ReportsPage } from './pages/ReportsPage';
 
 export default function App() {
   const route = useRoute();
@@ -25,6 +27,12 @@ export default function App() {
       break;
     case 'experiment':
       page = <ExperimentPage />;
+      break;
+    case 'analytics':
+      page = <AnalyticsPage />;
+      break;
+    case 'reports':
+      page = <ReportsPage />;
       break;
     case 'ai-insights':
       page = <AIInsightsPage />;

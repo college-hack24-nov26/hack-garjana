@@ -1,0 +1,168 @@
+{
+  "result_kind": "linear_static",
+  "analysis_type": "linear_static_structural",
+  "solver_name": "scikit-fem linear elasticity (quadratic tetrahedra)",
+  "solver_version": "skfem-12.0.2",
+  "solve_time_seconds": 85.52331859990954,
+  "degrees_of_freedom": 52482,
+  "summary": {
+    "mass_kg": 5.020797995155831,
+    "volume_m3": 0.0007071546472050466,
+    "max_von_mises_pa": 138758355.35467958,
+    "max_displacement_m": 0.00013084396637755736,
+    "compliance_j": 0.9025249368995029,
+    "min_factor_of_safety": 1.8016933060425526,
+    "factor_of_safety_basis": "yield strength 250 MPa divided by the peak nodal-projected von Mises stress",
+    "max_temperature_k": null,
+    "min_temperature_k": null,
+    "max_temperature_gradient_k_per_m": null,
+    "heat_flow_w": null,
+    "min_wall_thickness_m": 0.006019588379624715
+  },
+  "mesh_metadata": {
+    "node_count": 2673,
+    "tet_count": 10226,
+    "boundary_triangle_count": 3846,
+    "target_element_size_m": 0.007612499999999999,
+    "min_element_size_m": 0.0034256249999999994,
+    "fe_element_order": 2,
+    "gmsh_version": "4.15.2",
+    "quality": {
+      "min_quality": 0.03485293259223415,
+      "mean_quality": 0.8114934234679071,
+      "quality_measure": "gamma (inscribed/circumscribed radius ratio)",
+      "poor_element_count": 2,
+      "poor_element_threshold": 0.1
+    },
+    "subdomain_element_counts": {},
+    "warnings": [
+      "2 tetrahedra have quality below 0.1 (minimum 0.035); stress near those elements is less reliable"
+    ]
+  },
+  "region_applications": [
+    {
+      "region": "mounting_hole_surfaces",
+      "role": "support:fixed",
+      "facet_count": 86,
+      "area_m2": 0.0009263747356739294,
+      "note": "Barrels of the two knuckle mounting holes. Fixing them represents the bolted mount in a simplified way; bolt pretension and contact are not modelled."
+    },
+    {
+      "region": "piston_bore_surfaces",
+      "role": "load:pressure",
+      "facet_count": 173,
+      "area_m2": 0.003462004271639908,
+      "note": "10.000 MPa normal pressure over 34.6 cm2"
+    },
+    {
+      "region": "outboard_pad_abutment",
+      "role": "load:force",
+      "facet_count": 362,
+      "area_m2": 0.006924848191062408,
+      "note": "18095.6 N resultant spread as uniform traction over 69.2 cm2"
+    }
+  ],
+  "load_verifications": [
+    {
+      "region": "piston_bore_surfaces",
+      "load_type": "pressure",
+      "requested_magnitude_n": 17824.645705991446,
+      "requested_vector_n": [
+        1.2705494208814505e-14,
+        -17824.641745943663,
+        11.881619491166346
+      ],
+      "applied_magnitude_n": 17824.645705991436,
+      "applied_vector_n": [
+        4.3920422854171193e-13,
+        -17824.641745943652,
+        11.881619491166251
+      ],
+      "relative_error": 6.127848267192491e-16,
+      "tolerance": 0.02,
+      "passed": true,
+      "reference_basis": "minus pressure times the outward surface-normal integral, computed from the facet geometry",
+      "note": "10.000 MPa normal pressure over 34.6 cm2"
+    },
+    {
+      "region": "outboard_pad_abutment",
+      "load_type": "force",
+      "requested_magnitude_n": 18095.57368467721,
+      "requested_vector_n": [
+        0.0,
+        18095.57368467721,
+        0.0
+      ],
+      "applied_magnitude_n": 18095.57368467721,
+      "applied_vector_n": [
+        0.0,
+        18095.57368467721,
+        0.0
+      ],
+      "relative_error": 0.0,
+      "tolerance": 0.02,
+      "passed": true,
+      "reference_basis": "requested resultant force, spread as uniform traction over the region area",
+      "note": "18095.6 N resultant spread as uniform traction over 69.2 cm2"
+    }
+  ],
+  "field_artifact": {
+    "path": "D:\\TWIN ANIMATION\\Backend\\storage\\projects\\proj_b360a1ada998\\comp_1d37ce231a6f\\simulations\\opt_87624e7ba720\\cand_002\\result_fields_clamping_load.npz",
+    "format": "npz",
+    "node_count": 1925,
+    "triangle_count": 3846,
+    "has_displacement": true,
+    "has_stress": true,
+    "has_temperature": false,
+    "stress_location": "nodal_l2_projected",
+    "temperature_location": null,
+    "note": "Boundary surface of the analysis mesh with nodal displacement vectors and L2-projected nodal von Mises stress, in metres and pascals."
+  },
+  "material_snapshot": {
+    "primary": {
+      "material_id": "iron_gjs_400_18",
+      "name": "EN-GJS-400-18 ductile (spheroidal graphite) cast iron",
+      "family": "ductile_cast_iron",
+      "typical_use": "Brake caliper body, steering knuckle",
+      "condition": "As-cast ferritic matrix, EN-GJS-400-18 grade (400 MPa UTS / 18% elongation class).",
+      "density": 7100.0,
+      "elastic_modulus": 169000000000.0,
+      "poisson_ratio": 0.275,
+      "yield_strength": 250000000.0,
+      "ultimate_tensile_strength": 400000000.0,
+      "thermal_conductivity": 36.0,
+      "specific_heat": 515.0,
+      "max_service_temperature": 673.15,
+      "source_status": "illustrative_handbook_value",
+      "source_document": null,
+      "notes": null,
+      "temperature_dependent_properties": null,
+      "record_version": "1.0.0",
+      "last_reviewed": "2026-11-02"
+    }
+  },
+  "linear_solver_report": {
+    "method": "sparse direct factorisation (SuperLU)",
+    "unknowns": 51774,
+    "relative_residual": 1.800440826757796e-12,
+    "iterations": null,
+    "wall_seconds": 74.61187619995326,
+    "fell_back": true,
+    "note": "The iterative solve did not reach the required residual, so the system was factorised directly."
+  },
+  "energy_balance": {
+    "basis": "external work f.u against internal strain energy u'Ku",
+    "applied": 1.8050498737990057,
+    "recovered": 1.8050498737986596,
+    "unit": "J",
+    "relative_error": 1.9177727114517942e-13,
+    "tolerance": 0.02,
+    "passed": true
+  },
+  "load_case_id": "clamping_load",
+  "warnings": [
+    "2 tetrahedra have quality below 0.1 (minimum 0.035); stress near those elements is less reliable",
+    "unsmoothed stress at integration points peaks at 283.8 MPa versus 138.8 MPa after nodal projection. The difference indicates a local stress concentration or a geometric singularity; treat the peak value as mesh-dependent."
+  ],
+  "method_statement": "3D linear-elastic small-displacement finite-element analysis with 10-node tetrahedra, verified against the analytical cantilever-beam benchmark. It does not model fatigue, impact, contact, bolt pretension, plasticity or casting defects, and it is not a certification of road-worthiness."
+}

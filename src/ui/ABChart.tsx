@@ -26,6 +26,8 @@ export interface ABChartProps {
   digits?: number;
   /** Shaded horizontal band, e.g. the spark plug's heat-range window. */
   band?: { min: number; max: number; label: string };
+  /** Dashed vertical lines at x, e.g. where design A and design B sit on a parameter sweep. */
+  markers?: { A?: number; B?: number };
   /** Force the y axis to include zero. */
   zeroBased?: boolean;
   height?: number;
@@ -53,6 +55,7 @@ export function ABChart({
   band,
   zeroBased = false,
   height = 220,
+  markers,
 }: ABChartProps) {
   const wrap = useRef<HTMLDivElement>(null);
   const [w, setW] = useState(480);
@@ -162,6 +165,21 @@ export function ABChart({
         <path d={path('A')} fill="none" stroke={SERIES_COLOR.A} strokeWidth={2} strokeLinejoin="round" />
         <path d={path('B')} fill="none" stroke={SERIES_COLOR.B} strokeWidth={2} strokeLinejoin="round" />
         {/* Direct labels at the line ends, in text colour beside the coloured mark. */}
+        {markers &&
+          (['A', 'B'] as const).map((k) => {
+            const mx = markers[k];
+            if (mx === undefined || mx < x0 || mx > x1) return null;
+            // When A and B sit at the same x, offset B's tag so both stay readable.
+            const same = markers.A !== undefined && markers.B !== undefined && Math.abs(markers.A - markers.B) < 1e-9;
+            return (
+              <g key={`m${k}`} pointerEvents="none">
+                <line x1={sx(mx)} x2={sx(mx)} y1={PAD.t} y2={PAD.t + ph} stroke={SERIES_COLOR[k]} strokeDasharray="4 3" strokeWidth={1.25} />
+                <text x={sx(mx) + 3} y={PAD.t + 10 + (same && k === 'B' ? 12 : 0)} className="ab-end" style={{ fill: SERIES_COLOR[k] }}>
+                  {k}
+                </text>
+              </g>
+            );
+          })}
         <text x={sx(last.x) - 4} y={sy(last.A) - 6} className="ab-end" textAnchor="end">
           A
         </text>

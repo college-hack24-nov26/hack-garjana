@@ -1,0 +1,57 @@
+/* Digital Twin workspace: collapsible inspectors around the 3D stage.
+ * .workspace.tw out-ranks the legacy .workspace grid in styles.css. */
+.tw-wrap { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.tw-bar { display: flex; align-items: center; gap: 8px; }
+.tw-bar .tw-toggle:nth-child(2) { margin-left: auto; }
+.tw-bar .tw-toggle:nth-child(3) { margin-left: 8px; }
+.tw-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 30px;
+  padding: 0 11px;
+  border-radius: 8px;
+  border: 1px solid var(--hairline-strong, #2a3a57);
+  background: transparent;
+  color: var(--text-muted, #8495aa);
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+.tw-toggle:hover { color: var(--text-primary, #f2f6fc); border-color: rgba(218, 232, 250, 0.26); }
+.tw-toggle.on { color: var(--text-primary, #f2f6fc); background: rgba(218, 232, 250, 0.04); }
+.tw-toggle:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+
+.workspace.tw {
+  display: grid;
+  grid-template-columns: 276px minmax(0, 1fr) 284px;
+  grid-template-areas: 'left stage right';
+  gap: 14px;
+  align-items: start;
+}
+.workspace.tw.no-left { grid-template-columns: minmax(0, 1fr) 284px; grid-template-areas: 'stage right'; }
+.workspace.tw.no-right { grid-template-columns: 276px minmax(0, 1fr); grid-template-areas: 'left stage'; }
+.workspace.tw.no-left.no-right { grid-template-columns: minmax(0, 1fr); grid-template-areas: 'stage'; }
+.tw-left { grid-area: left; min-width: 0; }
+.tw-stage { grid-area: stage; min-width: 0; position: sticky; top: 0; }
+.tw-right { grid-area: right; min-width: 0; }
+.tw-left[hidden], .tw-right[hidden] { display: none; }
+/* Stage fits the window below the page header + KPI strip, so the view toolbar is visible without scrolling. */
+.tw-stage .viewport { height: clamp(480px, calc(100vh - 396px), 860px); }
+.workspace.tw.no-left.no-right .viewport { height: clamp(520px, calc(100vh - 396px), 920px); }
+
+@media (max-width: 1360px) {
+  .workspace.tw { grid-template-columns: 280px minmax(0, 1fr); grid-template-areas: 'left stage' 'right right'; }
+  .workspace.tw.no-left { grid-template-columns: minmax(0, 1fr); grid-template-areas: 'stage' 'right'; }
+  .workspace.tw.no-right { grid-template-columns: 280px minmax(0, 1fr); grid-template-areas: 'left stage'; }
+}
+@media (max-width: 960px) {
+  .workspace.tw, .workspace.tw.no-left, .workspace.tw.no-right {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: 'stage' 'left' 'right';
+  }
+  .tw-stage { position: static; }
+  .tw-bar .tw-toggle:nth-child(2) { display: none; }
+  .tw-bar .tw-toggle:nth-child(3) { margin-left: auto; }
+}

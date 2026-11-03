@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
-import type { MutableRefObject } from 'react';
+import type { MutableRefObject, ReactNode } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Edges, Html, OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
@@ -7,13 +7,13 @@ import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 import { StudioEnvironment } from '../../three/common';
 import { tipColour } from '../../modules/sparkPlug/engine/kinematics';
 import { caliperEstimate, plugEstimate } from '../../workspace/estimators';
-import type { CaliperDesign, CaliperInputs, PlugDesign, PlugInputs } from '../../workspace/designs';
+import type { CaliperDesign, CaliperInputs, ComponentId, PlugDesign, PlugInputs } from '../../workspace/designs';
 import { VERDICT_LABEL } from '../../workspace/validation';
 import type { RuleResult } from '../../workspace/validation';
 import type { InsightSource } from '../context';
 import { formatParam, paramMeta, paramValue, validateCandidate } from '../designAccess';
 import type { AnyDesign } from '../designAccess';
-import { PART_LABEL, lerpDesign } from './focusSpec';
+import { PART_LABEL, abFocus, lerpDesign, partsOf } from './focusSpec';
 import '../insights.css';
 import type { FocusSpec, PartId } from './focusSpec';
 
@@ -189,12 +189,28 @@ function fitGoal(objs: (THREE.Object3D | null)[], dir: [number, number, number],
  * snaps to the whole model first, then glides to the chosen view; a view button
  * glides from wherever the camera is. Dragging takes over at once.
  */
-function ViewCamera({ reg, view, whole, nonce, fitKey }: { reg: Registry; view: ViewDef; whole: ViewDef; nonce: number; fitKey: string }) {
+function ViewCamera({
+  reg,
+  view,
+  whole,
+  nonce,
+  fitKey,
+  halt,
+}: {
+  reg: Registry;
+  view: ViewDef;
+  whole: ViewDef;
+  nonce: number;
+  fitKey: string;
+  /** Bumped by a linked viewport when the user drags it: stop gliding so the drag wins. */
+  halt?: MutableRefObject<{ halt: number }>;
+}) {
   const { camera, controls, size } = useThree();
   const pending = useRef(2);
   const snap = useRef(true);
   const goal = useRef<Goal | null>(null);
   const gliding = useRef(false);
+  const haltSeen = useRef(0);
 
   useEffect(() => {
     // Wait a frame or two so every part has been sized by its own useFrame first.
@@ -217,6 +233,10 @@ function ViewCamera({ reg, view, whole, nonce, fitKey }: { reg: Registry; view: 
   useFrame((_, dt) => {
     const cam = camera as THREE.PerspectiveCamera;
     const c = controls as unknown as OrbitControlsImpl | null;
+    if (halt && halt.current.halt !== haltSeen.current) {
+      haltSeen.current = halt.current.halt;
+      gliding.current = false;
+    }
     if (pending.current > 0 && --pending.current === 0) {
       const all = fitGoal(reg.current.whole?.() ?? [], whole.dir, cam);
       if (!all) {
@@ -346,7 +366,8 @@ function PlugFocus({ spec, anim, inputs, frame, reg, cut, context }: ModelProps 
 
   reg.current = {
     whole: () => [frame.current],
-    nose: () => [nose.current],
+    // The nose plus the electrode tip under it, so a longer nose doesn't push the tip out of frame.
+    nose: () => [nose.current, electrode.current],
     electrode: () => [electrode.current, strapH.current],
     strap: () => [strapV.current, strapH.current],
   };
@@ -970,6 +991,311 @@ export function FocusViewer({ spec, src }: { spec: FocusSpec; src: InsightSource
         )}
         {spec.why && <div className="focus-why">{spec.why}</div>}
         <div className="hint">Numbers are reduced-order estimates, recomputed for every in-between shape. Not FEA.</div>
+      </div>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Design Lab: A and B side by side, on the part being edited         */
+/* ------------------------------------------------------------------ */
+
+type LabSlot = 'A' | 'B';
+
+/** Camera shared by the two viewports, so A and B are always seen from the same place at the same scale. */
+interface CamSync {
+  pos: THREE.Vector3;
+  target: THREE.Vector3;
+  near: number;
+  far: number;
+  minD: number;
+  maxD: number;
+  /** The user is dragging the B viewport (or its drag has only just ended). */
+  bActive: boolean;
+  bUntil: number;
+  halt: number;
+  ready: boolean;
+}
+
+/**
+ * Viewport A leads (it runs the view glides) and viewport B mirrors it. While
+ * the user drags B, B leads and A mirrors. Damping is off in both, so the
+ * mirrored camera never drifts.
+ */
+function SyncCamera({ sync, role }: { sync: MutableRefObject<CamSync>; role: LabSlot }) {
+  const { camera, controls } = useThree();
+  useEffect(() => {
+    if (role !== 'B') return;
+    const c = controls as unknown as OrbitControlsImpl | null;
+    if (!c) return;
+    const start = () => {
+      sync.current.bActive = true;
+    };
+    const end = () => {
+      sync.current.bActive = false;
+      sync.current.bUntil = performance.now() + 250;
+    };
+    c.addEventListener('start', start);
+    c.addEventListener('end', end);
+    return () => {
+      c.removeEventListener('start', start);
+      c.removeEventListener('end', end);
+    };
+  }, [controls, role, sync]);
+  useFrame(() => {
+    const S = sync.current;
+    const cam = camera as THREE.PerspectiveCamera;
+    const c = controls as unknown as OrbitControlsImpl | null;
+    if (!c) return;
+    const bLeads = S.bActive || performance.now() < S.bUntil;
+    const leads = role === 'A' ? !bLeads : bLeads;
+    if (leads) {
+      S.pos.copy(cam.position);
+      S.target.copy(c.target);
+      if (role === 'A') {
+        S.near = cam.near;
+        S.far = cam.far;
+        S.minD = c.minDistance;
+        S.maxD = c.maxDistance;
+        S.ready = true;
+      }
+      return;
+    }
+    if (!S.ready) return;
+    cam.position.copy(S.pos);
+    c.target.copy(S.target);
+    if (cam.near !== S.near || cam.far !== S.far) {
+      cam.near = S.near;
+      cam.far = S.far;
+      cam.updateProjectionMatrix();
+    }
+    c.minDistance = S.minD;
+    c.maxDistance = S.maxD;
+    c.update();
+    if (role === 'A') S.halt++;
+    // Default priority: a positive one would switch off R3F's automatic rendering.
+    // It still runs after ViewCamera, which is mounted (and so subscribed) first.
+  });
+  return null;
+}
+
+const noop = () => {};
+
+function LabPane({
+  slot,
+  spec,
+  src,
+  cut,
+  context,
+  reg,
+  frame,
+  sync,
+  viewCamera,
+}: {
+  slot: LabSlot;
+  spec: FocusSpec;
+  src: InsightSource;
+  cut: boolean;
+  context: boolean;
+  reg: Registry;
+  frame: MutableRefObject<THREE.Object3D | null>;
+  sync: MutableRefObject<CamSync>;
+  /** Only viewport A runs the view camera; B mirrors it. */
+  viewCamera?: ReactNode;
+}) {
+  const specRef = useRef(spec);
+  specRef.current = spec;
+  const anim = useRef<Anim>({ p: 0, t: 0, clock: 0, playing: false, manual: null, sinceTick: 0 });
+  return (
+    <Canvas
+      key={spec.component}
+      camera={{ position: [1, 0.6, 1.2], fov: 34, near: 0.01, far: 40 }}
+      dpr={[1, 2]}
+      gl={{ antialias: true }}
+      onCreated={({ gl }) => {
+        gl.localClippingEnabled = true;
+      }}
+    >
+      <color attach="background" args={['#0a1020']} />
+      <StudioEnvironment />
+      <ambientLight intensity={0.45} />
+      <directionalLight position={[1.2, 2, 1.5]} intensity={1.7} />
+      <directionalLight position={[-1.5, 0.5, -1]} intensity={0.5} color="#7aa7d8" />
+      <Timeline anim={anim} changed={false} onTick={noop} />
+      <CutContext.Provider value={cut}>
+        {spec.component === 'spark-plug' ? (
+          <PlugFocus spec={specRef} anim={anim} inputs={src.plugInputs} frame={frame} reg={reg} cut={cut} context={context} />
+        ) : (
+          <CaliperFocus spec={specRef} anim={anim} inputs={src.caliperInputs} frame={frame} reg={reg} cut={cut} context={context} />
+        )}
+      </CutContext.Provider>
+      <OrbitControls makeDefault enablePan={false} enableDamping={false} />
+      {viewCamera}
+      <SyncCamera sync={sync} role={slot} />
+    </Canvas>
+  );
+}
+
+export interface ABLabViewerProps {
+  src: InsightSource;
+  component: ComponentId;
+  designs: { A: AnyDesign; B: AnyDesign };
+  /** The parameter being edited right now: both models zoom to its part and label it. */
+  focusKey: string | null;
+}
+
+const ALL_VIEW_IDS: ViewId[] = ['whole', 'bridge', 'legs', 'pistons', 'slot', 'nose', 'electrode', 'strap'];
+
+/**
+ * Design A and design B side by side, seen through one linked camera, so a
+ * change in size is a change you can see. While a parameter is being edited,
+ * both viewports glide to the part it shapes, light it up and label its value.
+ */
+export function ABLabViewer({ src, component, designs, focusKey }: ABLabViewerProps) {
+  const views = VIEWS[component];
+  const a = designs.A as unknown as Record<string, unknown>;
+  const b = designs.B as unknown as Record<string, unknown>;
+  const diffKeys = Object.keys(b).filter((k) => k !== 'revision' && a[k] !== b[k]);
+  const keys = focusKey ? [focusKey] : diffKeys;
+  const parts = partsOf(keys);
+  const diffParts = partsOf(diffKeys);
+  const specFor = (d: AnyDesign, slot: LabSlot): FocusSpec => ({
+    component,
+    title: slot,
+    from: d,
+    to: d,
+    keys,
+    parts,
+    changed: false,
+    labels: { from: slot, to: slot },
+  });
+
+  const viewFor = (k: string | null): ViewId => (k ? (KEY_VIEW[k] ?? 'whole') : defaultView(abFocus(src, component, designs)));
+  const [follow, setFollow] = useState(true);
+  const [viewId, setViewId] = useState<ViewId>(() => viewFor(focusKey));
+  const [nonce, setNonce] = useState(0);
+  const [cut, setCut] = useState(() => !!views.find((v) => v.id === viewFor(focusKey))?.cut);
+  const [context, setContext] = useState(true);
+  const view = views.find((v) => v.id === viewId) ?? views[0];
+
+  const pick = (v: ViewDef) => {
+    setViewId(v.id);
+    setNonce((n) => n + 1);
+    setCut(!!v.cut);
+  };
+  // Follow the slider: editing a different parameter moves both cameras to its part.
+  useEffect(() => {
+    if (!follow || !focusKey) return;
+    const v = views.find((x) => x.id === (KEY_VIEW[focusKey] ?? 'whole')) ?? views[0];
+    if (v.id !== viewId) pick(v);
+  }, [focusKey, follow, component]);
+
+  const regA: Registry = useRef({});
+  const regB: Registry = useRef({});
+  const frameA = useRef<THREE.Object3D | null>(null);
+  const frameB = useRef<THREE.Object3D | null>(null);
+  // Frame both designs at once, so the camera shows the bigger one whole and the sizes compare 1:1.
+  const merged: Registry = useRef({});
+  merged.current = Object.fromEntries(
+    ALL_VIEW_IDS.map((id) => [id, () => [...(regA.current[id]?.() ?? []), ...(regB.current[id]?.() ?? [])]]),
+  );
+  const sync = useRef<CamSync>({
+    pos: new THREE.Vector3(),
+    target: new THREE.Vector3(),
+    near: 0.01,
+    far: 40,
+    minD: 0,
+    maxD: Infinity,
+    bActive: false,
+    bUntil: 0,
+    halt: 0,
+    ready: false,
+  });
+
+  const label = focusKey ? paramMeta(component, focusKey).label : null;
+  const valueOf = (d: AnyDesign) => (focusKey ? formatParam(component, focusKey, paramValue(d, focusKey)) : '');
+  let pct: number | null = null;
+  if (focusKey) {
+    const x = paramValue(designs.A, focusKey);
+    const y = paramValue(designs.B, focusKey);
+    if (typeof x === 'number' && typeof y === 'number' && Math.abs(x) > 1e-12) pct = ((y - x) / Math.abs(x)) * 100;
+  }
+
+  return (
+    <div className="lab3d">
+      <div className="lab3d-panes">
+        {(['A', 'B'] as LabSlot[]).map((slot) => (
+          <div key={slot} className={`lab3d-pane slot-${slot.toLowerCase()}`}>
+            <LabPane
+              slot={slot}
+              spec={specFor(designs[slot], slot)}
+              src={src}
+              cut={cut}
+              context={context}
+              reg={slot === 'A' ? regA : regB}
+              frame={slot === 'A' ? frameA : frameB}
+              sync={sync}
+              viewCamera={
+                slot === 'A' ? <ViewCamera reg={merged} view={view} whole={views[0]} nonce={nonce} fitKey={component} halt={sync} /> : undefined
+              }
+            />
+            <div className="lab3d-tag">
+              <span className="lab3d-slot">{slot}</span>
+              <span className="lab3d-rev">{(designs[slot] as { revision: string }).revision}</span>
+            </div>
+            {label && (
+              <div className="lab3d-value">
+                {label}: <b>{valueOf(designs[slot])}</b>
+                {slot === 'B' && pct !== null && Math.abs(pct) >= 0.05 && (
+                  <span className="lab3d-pct">
+                    {' '}
+                    ({pct > 0 ? '+' : ''}
+                    {pct.toFixed(Math.abs(pct) < 10 ? 1 : 0)} % vs A)
+                  </span>
+                )}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+      <div className="focus-views" role="toolbar" aria-label="3D views">
+        {views.map((v) => {
+          const marked = v.parts.some((x) => diffParts.includes(x));
+          return (
+            <button
+              key={v.id}
+              className={`vp-btn ${view.id === v.id ? 'active' : ''} ${marked ? 'marked' : ''}`}
+              aria-pressed={view.id === v.id}
+              title={marked ? `${v.label}: differs between A and B` : v.label}
+              onClick={() => pick(v)}
+            >
+              {marked && (
+                <span className="focus-mark" aria-label="differs">
+                  ●
+                </span>
+              )}
+              {v.label}
+            </button>
+          );
+        })}
+        <span className="focus-views-gap" />
+        <button className={`vp-btn ${cut ? 'active' : ''}`} aria-pressed={cut} onClick={() => setCut(!cut)}>
+          Cutaway
+        </button>
+        <button className={`vp-btn ${context ? 'active' : ''}`} aria-pressed={context} onClick={() => setContext(!context)}>
+          {component === 'brake-caliper' ? 'Rotor' : 'Shell'}
+        </button>
+        <button
+          className={`vp-btn ${follow ? 'active' : ''}`}
+          aria-pressed={follow}
+          title="Zoom both views to the part of the parameter you are changing"
+          onClick={() => setFollow(!follow)}
+        >
+          Follow slider
+        </button>
+        <button className="vp-btn focus-reset" onClick={() => setNonce((n) => n + 1)}>
+          ↺ Reset view
+        </button>
       </div>
     </div>
   );

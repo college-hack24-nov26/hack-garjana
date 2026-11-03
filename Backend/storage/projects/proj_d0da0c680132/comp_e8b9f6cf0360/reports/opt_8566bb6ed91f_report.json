@@ -1,0 +1,2114 @@
+{
+  "report_version": "1.0",
+  "generated_at": "2026-11-02T14:04:19.754828+00:00",
+  "title": "Spark Plug generative design study - E2E spark_plug",
+  "project": {
+    "id": "proj_d0da0c680132",
+    "name": "E2E spark_plug",
+    "description": "api test"
+  },
+  "component": {
+    "id": "comp_e8b9f6cf0360",
+    "name": "spark_plug design",
+    "type": "spark_plug",
+    "display_name": "Spark Plug",
+    "design_mode": "generate_new",
+    "imported_source": null,
+    "source_is_parametric": false
+  },
+  "study": {
+    "optimization_run_id": "opt_8566bb6ed91f",
+    "algorithm": "seeded Latin-hypercube design of experiments",
+    "random_seed": 20261102,
+    "candidate_budget": 4,
+    "generations": 1,
+    "design_variables": [
+      "insulator_nose_length_m",
+      "insulator_diameter_m",
+      "center_electrode_diameter_m",
+      "electrode_length_m"
+    ],
+    "status": "completed",
+    "termination_reason": "candidate budget of 4 exhausted",
+    "started_at": "2026-11-02T14:03:33.384165",
+    "completed_at": "2026-11-02T14:04:19.017409",
+    "summary": {
+      "candidates_generated": 5,
+      "candidates_evaluated": 5,
+      "candidates_feasible": 3,
+      "candidates_failed": 0,
+      "cache_hits": 0,
+      "total_seconds": 45.610297600000195,
+      "mean_solve_seconds": 5.672880740000619,
+      "max_solve_seconds": 7.00115420000111
+    }
+  },
+  "engineering_specification": {
+    "component_type": "spark_plug",
+    "design_mode": "generate_new",
+    "analysis_type": "steady_state_thermal",
+    "unit_system": "SI_canonical",
+    "objective_summary": "Explore insulator nose, electrode and insulator proportions that keep the firing-end temperature inside its operating window, while preserving the thread, seat and electrode-gap interfaces.",
+    "material_id": "steel_low_carbon_shell",
+    "material_assignments": {
+      "electrode": "nickel_alloy_electrode",
+      "insulator": "alumina_96",
+      "shell": "steel_low_carbon_shell"
+    },
+    "parameters": {
+      "thread_major_diameter_m": 0.014,
+      "thread_reach_m": 0.0175,
+      "electrode_gap_m": 0.0008,
+      "electrode_protrusion_m": 0.002,
+      "shell_length_m": 0.022,
+      "insulator_total_length_m": 0.044,
+      "insulator_nose_length_m": 0.0075,
+      "insulator_diameter_m": 0.0062,
+      "center_electrode_diameter_m": 0.0025,
+      "electrode_length_m": 0.03
+    },
+    "design_variables": [
+      "insulator_nose_length_m",
+      "insulator_diameter_m",
+      "center_electrode_diameter_m",
+      "electrode_length_m"
+    ],
+    "load_cases": [
+      {
+        "case_id": "steady_state_operating",
+        "name": "Steady-state operating condition",
+        "analysis_type": "steady_state_thermal",
+        "description": "Convective heat input on the firing end from gas at 900 C with h = 500 W/(m2.K); seat held at the cylinder-head temperature of 150 C; terminal end losing heat to 80 C air at h = 25 W/(m2.K).",
+        "loads": [],
+        "supports": [],
+        "thermal_boundary_conditions": [
+          {
+            "type": "convection",
+            "region": "combustion_exposed_surfaces",
+            "film_coefficient": {
+              "value": 500.0,
+              "unit": "W/(m2.K)"
+            },
+            "ambient_temperature": {
+              "value": 1173.15,
+              "unit": "K"
+            },
+            "note": "Combustion-side heat input. Combustion itself is not simulated; this is a convective boundary condition."
+          },
+          {
+            "type": "fixed_temperature",
+            "region": "cylinder_head_seat",
+            "temperature": {
+              "value": 423.15,
+              "unit": "K"
+            },
+            "note": "Thread and seat held at the cylinder-head temperature, assuming ideal thermal contact."
+          },
+          {
+            "type": "convection",
+            "region": "terminal_end_surfaces",
+            "film_coefficient": {
+              "value": 25.0,
+              "unit": "W/(m2.K)"
+            },
+            "ambient_temperature": {
+              "value": 353.15,
+              "unit": "K"
+            },
+            "note": "Convection to air in the plug well."
+          }
+        ],
+        "assumptions": []
+      }
+    ],
+    "objectives": [
+      {
+        "objective_id": "minimize_peak_temperature",
+        "metric": "max_temperature_k",
+        "sense": "minimize",
+        "weight": 1.0,
+        "label": "Minimise firing-end peak temperature"
+      },
+      {
+        "objective_id": "minimize_thermal_gradient",
+        "metric": "max_temperature_gradient_k_per_m",
+        "sense": "minimize",
+        "weight": 1.0,
+        "label": "Minimise peak temperature gradient (ceramic thermal stress proxy)"
+      }
+    ],
+    "constraints": [
+      {
+        "constraint_id": "heat_range_window",
+        "metric": "max_temperature_k",
+        "operator": "between",
+        "limit": null,
+        "lower": {
+          "value": 723.15,
+          "unit": "K"
+        },
+        "upper": {
+          "value": 1123.15,
+          "unit": "K"
+        },
+        "source_status": "user_supplied",
+        "source_reference": "Self-cleaning and pre-ignition limits supplied in engineering setup",
+        "label": "Firing-end temperature inside the heat-range window"
+      },
+      {
+        "constraint_id": "manufacturing_min_wall",
+        "metric": "min_wall_thickness_m",
+        "operator": "gte",
+        "limit": {
+          "value": 1.0,
+          "unit": "mm"
+        },
+        "lower": null,
+        "upper": null,
+        "source_status": "demo_fixture",
+        "source_reference": "Illustrative minimum section for the ceramic insulator wall and shell wall",
+        "label": "Minimum manufacturable section"
+      }
+    ],
+    "manufacturing_constraints": [],
+    "mesh_settings": {
+      "target_element_size_m": 0.0010625,
+      "min_element_size_m": 0.00047812500000000003,
+      "element_order": 2,
+      "optimize_quality": true,
+      "max_nodes": 200000
+    },
+    "solver_settings": {
+      "solver_id": "skfem_steady_state_thermal",
+      "timeout_seconds": 600,
+      "options": {}
+    },
+    "assumptions": [
+      {
+        "key": "combustion_boundary_demo_fixture",
+        "statement": "The default thermal load - 900 C gas at a 500 W/(m2.K) film coefficient on the firing end - is a demonstration fixture. Real values depend on the engine, the operating point and the duty cycle. The film coefficient in particular is the most uncertain input in this model and the computed temperatures scale strongly with it.",
+        "source_status": "demo_fixture",
+        "source_reference": null,
+        "requires_confirmation": true,
+        "confirmed": false
+      },
+      {
+        "key": "steady_state_only",
+        "statement": "This is a steady-state solution: it represents a sustained operating condition, not a warm-up, a transient load change or any part of the engine cycle. Cyclic peak surface temperatures are higher than a steady-state average.",
+        "source_status": "demo_fixture",
+        "source_reference": null,
+        "requires_confirmation": true,
+        "confirmed": false
+      },
+      {
+        "key": "head_temperature_demo_fixture",
+        "statement": "The 150 C default cylinder-head seat temperature is a demonstration fixture and is applied as a fixed temperature, which assumes the head is an ideal sink with no contact resistance at the seat.",
+        "source_status": "demo_fixture",
+        "source_reference": null,
+        "requires_confirmation": true,
+        "confirmed": false
+      },
+      {
+        "key": "heat_range_window_demo_fixture",
+        "statement": "The 450 C to 850 C operating window is the commonly cited self-cleaning to pre-ignition range for a spark plug firing end. It is entered here as a demonstration fixture, not as a specification from a plug or engine manufacturer. Confirm the window that applies to your application.",
+        "source_status": "demo_fixture",
+        "source_reference": null,
+        "requires_confirmation": true,
+        "confirmed": false
+      },
+      {
+        "key": "perfect_interfaces",
+        "statement": "The shell, insulator and electrode are modelled as perfectly bonded, so no contact thermal resistance is included at their interfaces. Real assemblies have some resistance, which would raise the computed firing-end temperature.",
+        "source_status": "demo_fixture",
+        "source_reference": null,
+        "requires_confirmation": false,
+        "confirmed": false
+      },
+      {
+        "key": "geometry_simplification",
+        "statement": "Simplified three-part spark-plug thermal template: centre electrode, ceramic insulator and metal shell as concentric solids of revolution with perfectly conducting interfaces. The hex, terminal, ground electrode arm, internal resistor, seals, gasket, thread form and precious-metal tips are not modelled. Thread major diameter, reach, seat position and electrode gap are preserved interfaces and cannot be changed by the optimizer.",
+        "source_status": "demo_fixture",
+        "source_reference": null,
+        "requires_confirmation": false,
+        "confirmed": false
+      }
+    ],
+    "requested_candidate_budget": 4,
+    "random_seed": 20261102
+  },
+  "engineering_inputs_canonical": {
+    "gas_temperature_k": 1173.15,
+    "gas_film_coefficient": 500.0,
+    "head_temperature_k": 423.15,
+    "ambient_temperature_k": 353.15,
+    "ambient_film_coefficient": 25.0,
+    "min_operating_temperature_k": 723.15,
+    "max_operating_temperature_k": 1123.15
+  },
+  "objectives": [
+    {
+      "objective_id": "minimize_peak_temperature",
+      "metric": "max_temperature_k",
+      "sense": "minimize",
+      "weight": 1.0,
+      "label": "Minimise firing-end peak temperature"
+    },
+    {
+      "objective_id": "minimize_thermal_gradient",
+      "metric": "max_temperature_gradient_k_per_m",
+      "sense": "minimize",
+      "weight": 1.0,
+      "label": "Minimise peak temperature gradient (ceramic thermal stress proxy)"
+    }
+  ],
+  "constraints": [
+    {
+      "constraint_id": "heat_range_window",
+      "metric": "max_temperature_k",
+      "operator": "between",
+      "limit": null,
+      "lower": {
+        "value": 723.15,
+        "unit": "K"
+      },
+      "upper": {
+        "value": 1123.15,
+        "unit": "K"
+      },
+      "source_status": "user_supplied",
+      "source_reference": "Self-cleaning and pre-ignition limits supplied in engineering setup",
+      "label": "Firing-end temperature inside the heat-range window"
+    },
+    {
+      "constraint_id": "manufacturing_min_wall",
+      "metric": "min_wall_thickness_m",
+      "operator": "gte",
+      "limit": {
+        "value": 1.0,
+        "unit": "mm"
+      },
+      "lower": null,
+      "upper": null,
+      "source_status": "demo_fixture",
+      "source_reference": "Illustrative minimum section for the ceramic insulator wall and shell wall",
+      "label": "Minimum manufacturable section"
+    }
+  ],
+  "scope": {
+    "analysis_type": "steady_state_thermal",
+    "scope_statement": "Genuine 3D steady-state heat-conduction finite-element analysis of the electrode / insulator / shell assembly, with convective heat input from the combustion side, conduction into the cylinder-head seat, and convection to air at the terminal end. Each part carries its own thermal conductivity and the interfaces between them are treated as perfectly conducting.",
+    "not_in_scope": [
+      "Combustion, flame propagation and cylinder pressure",
+      "Spark and ignition discharge, and all electrical behaviour",
+      "In-cylinder gas flow and charge motion",
+      "Transient engine-cycle thermal response (this is a steady-state solution)",
+      "Contact thermal resistance between the shell, insulator and electrode",
+      "Deposit build-up, electrode erosion and service life",
+      "Mechanical stress, thread strength and sealing performance"
+    ],
+    "geometry_capability_note": "Simplified three-part spark-plug thermal template: centre electrode, ceramic insulator and metal shell as concentric solids of revolution with perfectly conducting interfaces. The hex, terminal, ground electrode arm, internal resistor, seals, gasket, thread form and precious-metal tips are not modelled. Thread major diameter, reach, seat position and electrode gap are preserved interfaces and cannot be changed by the optimizer.",
+    "solver": {
+      "solver_id": "skfem_steady_state_thermal",
+      "name": "scikit-fem steady-state conduction (quadratic tetrahedra)",
+      "version": "skfem-12.0.2",
+      "result_kind": "steady_state_thermal",
+      "method_statement": "3D steady-state Fourier heat-conduction finite-element analysis with 10-node tetrahedra and per-material subdomains, verified against the analytical 1D conduction benchmark. Interfaces between assembled parts are treated as perfectly conducting. It does not model combustion, ignition discharge, cylinder pressure or flow, or any transient engine-cycle behaviour."
+    }
+  },
+  "solver_verification": {
+    "benchmarks": [
+      {
+        "name": "cantilever_beam_linear_static",
+        "description": "End-loaded cantilever 200 x 20 x 20 mm, E = 210 GPa, nu = 0.3, tip load 1000 N, clamped at x = 0.",
+        "reference_source": "Euler-Bernoulli tip deflection PL^3/(3EI) with the Timoshenko shear correction PL/(kGA), k = 5/6; peak bending stress M c / I.",
+        "passed": true,
+        "quantities": {
+          "tip_deflection": {
+            "computed": 0.0009522452735821438,
+            "reference": 0.0009598095238095238,
+            "unit": "m",
+            "relative_error": 0.00788099100887973,
+            "tolerance": 0.05,
+            "reference_basis": "Timoshenko beam deflection including shear",
+            "passed": true
+          },
+          "tip_deflection_vs_euler_bernoulli": {
+            "computed": 0.0009522452735821438,
+            "reference": 0.0009523809523809524,
+            "unit": "m",
+            "relative_error": 0.0001424627387489974,
+            "tolerance": 0.05,
+            "reference_basis": "Euler-Bernoulli beam deflection (shear neglected)",
+            "passed": true
+          },
+          "max_bending_stress": {
+            "computed": 147646475.30736905,
+            "reference": 149999999.99999997,
+            "unit": "Pa",
+            "relative_error": 0.01569016461753945,
+            "tolerance": 0.1,
+            "reference_basis": "Beam bending stress M c / I at the clamped root",
+            "passed": true
+          }
+        },
+        "notes": [
+          "Peak stress is compared at a 10 percent tolerance because the fully clamped face is a stress concentration that beam theory does not represent.",
+          "Mesh: 1082 nodes, 3612 tetrahedra, 19962 displacement degrees of freedom."
+        ]
+      },
+      {
+        "name": "bar_1d_steady_state_conduction",
+        "description": "Steady-state conduction through a 100 x 20 x 20 mm bar, k = 45.0 W/(m.K), 800.0 K at x = 0 and 400.0 K at x = L, remaining faces adiabatic.",
+        "reference_source": "Analytical 1D conduction: linear profile T(x) = T_hot + (T_cold - T_hot) x / L, heat flow Q = k A (T_hot - T_cold) / L.",
+        "passed": true,
+        "quantities": {
+          "max_nodal_temperature_error": {
+            "computed": 4.774847184307873e-12,
+            "reference": 0.0,
+            "unit": "K",
+            "relative_error": 4.774847184307873e-12,
+            "tolerance": 1e-06,
+            "reference_basis": "Exact linear profile; any non-zero value is discretization error",
+            "passed": true
+          },
+          "heat_flow_through_cold_face": {
+            "computed": 72.00000000000132,
+            "reference": 72.0,
+            "unit": "W",
+            "relative_error": 1.8355687340469256e-14,
+            "tolerance": 0.01,
+            "reference_basis": "Analytical Q = k A dT / L",
+            "passed": true
+          },
+          "temperature_gradient": {
+            "computed": 4000.0,
+            "reference": 4000.0,
+            "unit": "K/m",
+            "relative_error": 0.0,
+            "tolerance": 0.01,
+            "reference_basis": "Analytical uniform gradient dT/L",
+            "passed": true
+          }
+        },
+        "notes": [
+          "Mesh: 396 nodes, 1220 tetrahedra, 2351 temperature degrees of freedom."
+        ]
+      }
+    ],
+    "all_passed": true,
+    "note": "These benchmarks compare the same solver code path used for the results in this report against closed-form solutions."
+  },
+  "baseline_candidate_id": "cand_4135332bb3b7",
+  "recommended_candidate_id": "cand_790bcb7c3a31",
+  "recommendation": {
+    "candidate_id": "cand_790bcb7c3a31",
+    "improves_on_baseline": false,
+    "primary_metric": "max_temperature_k",
+    "baseline_value": 728.752751305586,
+    "candidate_value": 809.6430526585063,
+    "percent_change": 11.09982791941472,
+    "statement": "Candidate 4 is the best feasible generated design, but it does not beat the baseline on max_temperature_k (728.8 to 809.6). Every candidate that reached a lower value violated a constraint. The baseline remains the best feasible design in the space searched so far."
+  },
+  "baseline_vs_recommended": {
+    "mass_kg": {
+      "available": true,
+      "baseline": {
+        "value": 0.026705189613085156,
+        "unit": "kg",
+        "canonical_value": 0.026705189613085156,
+        "canonical_unit": "kg"
+      },
+      "candidate": {
+        "value": 0.026317058096432533,
+        "unit": "kg",
+        "canonical_value": 0.026317058096432533,
+        "canonical_unit": "kg"
+      },
+      "absolute_change": -0.00038813151665262335,
+      "percent_change": -1.4533935998059513
+    },
+    "max_temperature_k": {
+      "available": true,
+      "baseline": {
+        "value": 455.602751305586,
+        "unit": "C",
+        "canonical_value": 728.752751305586,
+        "canonical_unit": "K"
+      },
+      "candidate": {
+        "value": 536.4930526585064,
+        "unit": "C",
+        "canonical_value": 809.6430526585063,
+        "canonical_unit": "K"
+      },
+      "absolute_change": 80.89030135292035,
+      "percent_change": 11.09982791941472
+    },
+    "min_temperature_k": {
+      "available": true,
+      "baseline": {
+        "value": 140.5633679409063,
+        "unit": "C",
+        "canonical_value": 413.71336794090627,
+        "canonical_unit": "K"
+      },
+      "candidate": {
+        "value": 144.800302941481,
+        "unit": "C",
+        "canonical_value": 417.95030294148097,
+        "canonical_unit": "K"
+      },
+      "absolute_change": 4.236935000574704,
+      "percent_change": 1.0241233010338444
+    },
+    "max_temperature_gradient_k_per_m": {
+      "available": true,
+      "baseline": {
+        "value": 95.5532427613176,
+        "unit": "K/mm",
+        "canonical_value": 95553.24276131761,
+        "canonical_unit": "K/m"
+      },
+      "candidate": {
+        "value": 102.62073001839336,
+        "unit": "K/mm",
+        "canonical_value": 102620.73001839335,
+        "canonical_unit": "K/m"
+      },
+      "absolute_change": 7067.487257075743,
+      "percent_change": 7.396386614245647
+    },
+    "heat_flow_w": {
+      "available": true,
+      "baseline": {
+        "value": 33.961447792955695,
+        "unit": "W",
+        "canonical_value": 33.961447792955695,
+        "canonical_unit": "W"
+      },
+      "candidate": {
+        "value": 60.83626690385279,
+        "unit": "W",
+        "canonical_value": 60.83626690385279,
+        "canonical_unit": "W"
+      },
+      "absolute_change": 26.874819110897093,
+      "percent_change": 79.13331397041172
+    }
+  },
+  "mesh_convergence": {
+    "performed": true,
+    "coarse_preset": "exploration",
+    "fine_preset": "verification",
+    "coarse_nodes": 4415,
+    "fine_nodes": 6257,
+    "metrics": {
+      "mass_kg": {
+        "available": true,
+        "coarse": 0.026317058096432533,
+        "fine": 0.026338121390850087,
+        "relative_change": 0.0008003666040623986,
+        "percent_change": 0.08003666040623986,
+        "converged": true
+      },
+      "max_temperature_k": {
+        "available": true,
+        "coarse": 809.6430526585063,
+        "fine": 808.5863097436384,
+        "relative_change": -0.0013051960507758451,
+        "percent_change": -0.1305196050775845,
+        "converged": true
+      },
+      "min_temperature_k": {
+        "available": true,
+        "coarse": 417.95030294148097,
+        "fine": 417.9435306247448,
+        "relative_change": -1.620364117093281e-05,
+        "percent_change": -0.001620364117093281,
+        "converged": true
+      },
+      "max_temperature_gradient_k_per_m": {
+        "available": true,
+        "coarse": 102620.73001839335,
+        "fine": 108755.70948644886,
+        "relative_change": 0.059783042538831044,
+        "percent_change": 5.978304253883104,
+        "converged": true
+      },
+      "heat_flow_w": {
+        "available": true,
+        "coarse": 60.83626690385279,
+        "fine": 62.74895827991897,
+        "relative_change": 0.031439985939457,
+        "percent_change": 3.1439985939457,
+        "converged": true
+      }
+    },
+    "converged": true,
+    "tolerance": 0.1,
+    "statement": "Re-solving the recommended design on a refined mesh (4415 to 6257 nodes) changed every reported metric by at most 6.0%, within the 10% tolerance, and the feasibility verdict is unchanged. The result is mesh-converged for these metrics.",
+    "fine_candidate_id": "cand_b5f3e39b01cb",
+    "coarse_feasible": true,
+    "fine_feasible": true,
+    "verdict_changed": false,
+    "fine_constraint_results": [
+      {
+        "constraint_id": "heat_range_window",
+        "metric": "max_temperature_k",
+        "label": "Firing-end temperature inside the heat-range window",
+        "operator": "between",
+        "description": "max_temperature_k in [723.15 K, 1123.15 K]",
+        "source_status": "user_supplied",
+        "source_reference": "Self-cleaning and pre-ignition limits supplied in engineering setup",
+        "value": {
+          "value": 535.4363097436384,
+          "unit": "C",
+          "canonical_value": 808.5863097436384,
+          "canonical_unit": "K"
+        },
+        "limit": null,
+        "lower": {
+          "value": 450.0,
+          "unit": "C",
+          "canonical_value": 723.15,
+          "canonical_unit": "K"
+        },
+        "upper": {
+          "value": 850.0000000000001,
+          "unit": "C",
+          "canonical_value": 1123.15,
+          "canonical_unit": "K"
+        },
+        "passed": true,
+        "margin_fraction": 0.2135907743590959,
+        "note": null
+      },
+      {
+        "constraint_id": "manufacturing_min_wall",
+        "metric": "min_wall_thickness_m",
+        "label": "Minimum manufacturable section",
+        "operator": "gte",
+        "description": "min_wall_thickness_m >= 1.0 mm",
+        "source_status": "demo_fixture",
+        "source_reference": "Illustrative minimum section for the ceramic insulator wall and shell wall",
+        "value": {
+          "value": 1.745217252271003,
+          "unit": "mm",
+          "canonical_value": 0.001745217252271003,
+          "canonical_unit": "m"
+        },
+        "limit": {
+          "value": 1.0,
+          "unit": "mm",
+          "canonical_value": 0.001,
+          "canonical_unit": "m"
+        },
+        "lower": null,
+        "upper": null,
+        "passed": true,
+        "margin_fraction": 0.745217252271003,
+        "note": null
+      }
+    ],
+    "unconverged_metrics": []
+  },
+  "candidates": [
+    {
+      "candidate_id": "cand_4135332bb3b7",
+      "index": 0,
+      "generation": 0,
+      "label": "Baseline",
+      "status": "feasible",
+      "is_baseline": true,
+      "is_feasible": true,
+      "rank": 1,
+      "pareto_front": 0,
+      "parameters": {
+        "thread_major_diameter_m": 0.014,
+        "thread_reach_m": 0.0175,
+        "electrode_gap_m": 0.0008,
+        "electrode_protrusion_m": 0.002,
+        "shell_length_m": 0.022,
+        "insulator_total_length_m": 0.044,
+        "insulator_nose_length_m": 0.0075,
+        "insulator_diameter_m": 0.0062,
+        "center_electrode_diameter_m": 0.0025,
+        "electrode_length_m": 0.03
+      },
+      "geometry_hash": "db08ca6857b15b7d8a576b0f5f8539dc",
+      "metrics": {
+        "mass_kg": {
+          "value": 0.026705189613085156,
+          "unit": "kg",
+          "canonical_value": 0.026705189613085156,
+          "canonical_unit": "kg"
+        },
+        "volume_m3": {
+          "value": 3.982110060094474e-06,
+          "unit": "m3",
+          "canonical_value": 3.982110060094474e-06,
+          "canonical_unit": "m3"
+        },
+        "max_temperature_k": {
+          "value": 455.602751305586,
+          "unit": "C",
+          "canonical_value": 728.752751305586,
+          "canonical_unit": "K"
+        },
+        "min_temperature_k": {
+          "value": 140.5633679409063,
+          "unit": "C",
+          "canonical_value": 413.71336794090627,
+          "canonical_unit": "K"
+        },
+        "max_temperature_gradient_k_per_m": {
+          "value": 95.5532427613176,
+          "unit": "K/mm",
+          "canonical_value": 95553.24276131761,
+          "canonical_unit": "K/m"
+        },
+        "heat_flow_w": {
+          "value": 33.961447792955695,
+          "unit": "W",
+          "canonical_value": 33.961447792955695,
+          "canonical_unit": "W"
+        },
+        "min_wall_thickness_m": {
+          "value": 1.25,
+          "unit": "mm",
+          "canonical_value": 0.00125,
+          "canonical_unit": "m"
+        }
+      },
+      "constraint_results": [
+        {
+          "constraint_id": "heat_range_window",
+          "metric": "max_temperature_k",
+          "label": "Firing-end temperature inside the heat-range window",
+          "operator": "between",
+          "description": "max_temperature_k in [723.15 K, 1123.15 K]",
+          "source_status": "user_supplied",
+          "source_reference": "Self-cleaning and pre-ignition limits supplied in engineering setup",
+          "value": {
+            "value": 455.602751305586,
+            "unit": "C",
+            "canonical_value": 728.752751305586,
+            "canonical_unit": "K"
+          },
+          "limit": null,
+          "lower": {
+            "value": 450.0,
+            "unit": "C",
+            "canonical_value": 723.15,
+            "canonical_unit": "K"
+          },
+          "upper": {
+            "value": 850.0000000000001,
+            "unit": "C",
+            "canonical_value": 1123.15,
+            "canonical_unit": "K"
+          },
+          "passed": true,
+          "margin_fraction": 0.01400687826396506,
+          "note": null
+        },
+        {
+          "constraint_id": "manufacturing_min_wall",
+          "metric": "min_wall_thickness_m",
+          "label": "Minimum manufacturable section",
+          "operator": "gte",
+          "description": "min_wall_thickness_m >= 1.0 mm",
+          "source_status": "demo_fixture",
+          "source_reference": "Illustrative minimum section for the ceramic insulator wall and shell wall",
+          "value": {
+            "value": 1.25,
+            "unit": "mm",
+            "canonical_value": 0.00125,
+            "canonical_unit": "m"
+          },
+          "limit": {
+            "value": 1.0,
+            "unit": "mm",
+            "canonical_value": 0.001,
+            "canonical_unit": "m"
+          },
+          "lower": null,
+          "upper": null,
+          "passed": true,
+          "margin_fraction": 0.25,
+          "note": null
+        }
+      ],
+      "infeasibility_reasons": [],
+      "failure_stage": null,
+      "failure_reason": null,
+      "warnings": [],
+      "solve_time_seconds": 5.941633999998885,
+      "mesh_node_count": 4080,
+      "step_artifact": "C:\\Users\\Sarthak\\Desktop\\phaltan\\storage\\projects\\proj_d0da0c680132\\comp_e8b9f6cf0360\\simulations\\opt_8566bb6ed91f\\baseline\\design.step",
+      "preview_artifact": "C:\\Users\\Sarthak\\Desktop\\phaltan\\storage\\projects\\proj_d0da0c680132\\comp_e8b9f6cf0360\\simulations\\opt_8566bb6ed91f\\baseline\\preview.glb",
+      "provenance": {
+        "solver_name": "scikit-fem steady-state conduction (quadratic tetrahedra)",
+        "solver_version": "skfem-12.0.2",
+        "result_kind": "steady_state_thermal",
+        "analysis_type": "steady_state_thermal",
+        "load_case_id": "steady_state_operating",
+        "degrees_of_freedom": 28585,
+        "mesh_preset": "exploration",
+        "mesh_metadata": {
+          "node_count": 4080,
+          "tet_count": 18349,
+          "boundary_triangle_count": 5598,
+          "target_element_size_m": 0.0010625,
+          "min_element_size_m": 0.00047812500000000003,
+          "fe_element_order": 2,
+          "gmsh_version": "4.15.2",
+          "quality": {
+            "min_quality": 0.2907448783154252,
+            "mean_quality": 0.8124898722515237,
+            "quality_measure": "gamma (inscribed/circumscribed radius ratio)",
+            "poor_element_count": 0,
+            "poor_element_threshold": 0.1
+          },
+          "subdomain_element_counts": {
+            "electrode": 770,
+            "insulator": 5810,
+            "shell": 11769
+          },
+          "warnings": []
+        },
+        "mesh_settings": {
+          "target_element_size_m": 0.0010625,
+          "min_element_size_m": 0.00047812500000000003,
+          "element_order": 2,
+          "optimize_quality": true,
+          "max_nodes": 200000
+        },
+        "linear_solver": {
+          "method": "sparse direct factorisation (SuperLU)",
+          "unknowns": 25131,
+          "relative_residual": 7.90179699143822e-15,
+          "iterations": null,
+          "wall_seconds": 5.249309099999664,
+          "fell_back": false,
+          "note": ""
+        },
+        "material_snapshot": {
+          "electrode": {
+            "material_id": "nickel_alloy_electrode",
+            "name": "Nickel-alloy centre-electrode stock",
+            "family": "nickel_alloy",
+            "typical_use": "Spark-plug centre and ground electrode",
+            "density": 8900.0,
+            "elastic_modulus": 207000000000.0,
+            "poisson_ratio": 0.31,
+            "yield_strength": 148000000.0,
+            "ultimate_tensile_strength": 462000000.0,
+            "thermal_conductivity": 90.7,
+            "specific_heat": 444.0,
+            "max_service_temperature": 1273.15,
+            "source_status": "illustrative_handbook_value",
+            "source_document": null,
+            "notes": null,
+            "temperature_dependent_properties": null,
+            "record_version": "1.0.0",
+            "last_reviewed": "2026-11-02"
+          },
+          "insulator": {
+            "material_id": "alumina_96",
+            "name": "96 percent alumina technical ceramic (Al2O3)",
+            "family": "technical_ceramic",
+            "typical_use": "Spark-plug insulator",
+            "density": 3720.0,
+            "elastic_modulus": 300000000000.0,
+            "poisson_ratio": 0.21,
+            "yield_strength": null,
+            "ultimate_tensile_strength": 193000000.0,
+            "thermal_conductivity": 24.7,
+            "specific_heat": 880.0,
+            "max_service_temperature": 1973.15,
+            "source_status": "illustrative_handbook_value",
+            "source_document": null,
+            "notes": "Brittle ceramic: no yield point is defined, so a structural factor of safety against yield is not computed for this material. The thermal properties are the ones used by the spark-plug profile.",
+            "temperature_dependent_properties": null,
+            "record_version": "1.0.0",
+            "last_reviewed": "2026-11-02"
+          },
+          "shell": {
+            "material_id": "steel_low_carbon_shell",
+            "name": "Low-carbon steel spark-plug shell stock",
+            "family": "carbon_steel",
+            "typical_use": "Spark-plug metal shell (threaded body)",
+            "density": 7850.0,
+            "elastic_modulus": 205000000000.0,
+            "poisson_ratio": 0.29,
+            "yield_strength": 250000000.0,
+            "ultimate_tensile_strength": 400000000.0,
+            "thermal_conductivity": 51.9,
+            "specific_heat": 486.0,
+            "max_service_temperature": 873.15,
+            "source_status": "illustrative_handbook_value",
+            "source_document": null,
+            "notes": null,
+            "temperature_dependent_properties": null,
+            "record_version": "1.0.0",
+            "last_reviewed": "2026-11-02"
+          }
+        },
+        "region_applications": [
+          {
+            "region": "combustion_exposed_surfaces",
+            "role": "thermal:convection",
+            "facet_count": 756,
+            "area_m2": 0.0003144299286528331,
+            "note": "h = 500 W/(m2.K) to 900.0 C ambient over 3.14 cm2"
+          },
+          {
+            "region": "cylinder_head_seat",
+            "role": "thermal:fixed_temperature",
+            "facet_count": 1674,
+            "area_m2": 0.0007772911708359459,
+            "note": "temperature held at 150.0 C over 7.77 cm2"
+          },
+          {
+            "region": "terminal_end_surfaces",
+            "role": "thermal:convection",
+            "facet_count": 1267,
+            "area_m2": 0.0005426570327861106,
+            "note": "h = 25 W/(m2.K) to 80.0 C ambient over 5.43 cm2"
+          }
+        ],
+        "load_verifications": [],
+        "method_statement": "3D steady-state Fourier heat-conduction finite-element analysis with 10-node tetrahedra and per-material subdomains, verified against the analytical 1D conduction benchmark. Interfaces between assembled parts are treated as perfectly conducting. It does not model combustion, ignition discharge, cylinder pressure or flow, or any transient engine-cycle behaviour."
+      }
+    },
+    {
+      "candidate_id": "cand_9554f6ffda3b",
+      "index": 1,
+      "generation": 0,
+      "label": "Candidate 1",
+      "status": "infeasible",
+      "is_baseline": false,
+      "is_feasible": false,
+      "rank": 4,
+      "pareto_front": null,
+      "parameters": {
+        "thread_major_diameter_m": 0.014,
+        "thread_reach_m": 0.0175,
+        "electrode_gap_m": 0.0008,
+        "electrode_protrusion_m": 0.002,
+        "shell_length_m": 0.022,
+        "insulator_total_length_m": 0.044,
+        "insulator_nose_length_m": 0.007287652930162732,
+        "insulator_diameter_m": 0.006598859372758105,
+        "center_electrode_diameter_m": 0.0018937478389910649,
+        "electrode_length_m": 0.042774608774740056
+      },
+      "geometry_hash": "3e0e531e61f2b48bf7703059dbea421f",
+      "metrics": {
+        "mass_kg": {
+          "value": 0.026738153453626463,
+          "unit": "kg",
+          "canonical_value": 0.026738153453626463,
+          "canonical_unit": "kg"
+        },
+        "volume_m3": {
+          "value": 4.135588008655552e-06,
+          "unit": "m3",
+          "canonical_value": 4.135588008655552e-06,
+          "canonical_unit": "m3"
+        },
+        "max_temperature_k": {
+          "value": 460.21852908415826,
+          "unit": "C",
+          "canonical_value": 733.3685290841582,
+          "canonical_unit": "K"
+        },
+        "min_temperature_k": {
+          "value": 143.82702673892987,
+          "unit": "C",
+          "canonical_value": 416.97702673892985,
+          "canonical_unit": "K"
+        },
+        "max_temperature_gradient_k_per_m": {
+          "value": 95.54534994214137,
+          "unit": "K/mm",
+          "canonical_value": 95545.34994214137,
+          "canonical_unit": "K/m"
+        },
+        "heat_flow_w": {
+          "value": 32.160827866616664,
+          "unit": "W",
+          "canonical_value": 32.160827866616664,
+          "canonical_unit": "W"
+        },
+        "min_wall_thickness_m": {
+          "value": 0.9468739194955325,
+          "unit": "mm",
+          "canonical_value": 0.0009468739194955324,
+          "canonical_unit": "m"
+        }
+      },
+      "constraint_results": [
+        {
+          "constraint_id": "heat_range_window",
+          "metric": "max_temperature_k",
+          "label": "Firing-end temperature inside the heat-range window",
+          "operator": "between",
+          "description": "max_temperature_k in [723.15 K, 1123.15 K]",
+          "source_status": "user_supplied",
+          "source_reference": "Self-cleaning and pre-ignition limits supplied in engineering setup",
+          "value": {
+            "value": 460.21852908415826,
+            "unit": "C",
+            "canonical_value": 733.3685290841582,
+            "canonical_unit": "K"
+          },
+          "limit": null,
+          "lower": {
+            "value": 450.0,
+            "unit": "C",
+            "canonical_value": 723.15,
+            "canonical_unit": "K"
+          },
+          "upper": {
+            "value": 850.0000000000001,
+            "unit": "C",
+            "canonical_value": 1123.15,
+            "canonical_unit": "K"
+          },
+          "passed": true,
+          "margin_fraction": 0.02554632271039565,
+          "note": null
+        },
+        {
+          "constraint_id": "manufacturing_min_wall",
+          "metric": "min_wall_thickness_m",
+          "label": "Minimum manufacturable section",
+          "operator": "gte",
+          "description": "min_wall_thickness_m >= 1.0 mm",
+          "source_status": "demo_fixture",
+          "source_reference": "Illustrative minimum section for the ceramic insulator wall and shell wall",
+          "value": {
+            "value": 0.9468739194955325,
+            "unit": "mm",
+            "canonical_value": 0.0009468739194955324,
+            "canonical_unit": "m"
+          },
+          "limit": {
+            "value": 1.0,
+            "unit": "mm",
+            "canonical_value": 0.001,
+            "canonical_unit": "m"
+          },
+          "lower": null,
+          "upper": null,
+          "passed": false,
+          "margin_fraction": -0.053126080504467585,
+          "note": null
+        }
+      ],
+      "infeasibility_reasons": [
+        "manufacturing_min_wall: min_wall_thickness_m >= 1.0 mm violated (actual 0.9469 mm)"
+      ],
+      "failure_stage": null,
+      "failure_reason": null,
+      "warnings": [
+        "1 tetrahedra have quality below 0.1 (minimum 0.098); stress near those elements is less reliable",
+        "1 tetrahedra have quality below 0.1 (minimum 0.098); stress near those elements is less reliable"
+      ],
+      "solve_time_seconds": 5.448771000001216,
+      "mesh_node_count": 4125,
+      "step_artifact": "C:\\Users\\Sarthak\\Desktop\\phaltan\\storage\\projects\\proj_d0da0c680132\\comp_e8b9f6cf0360\\simulations\\opt_8566bb6ed91f\\cand_001\\design.step",
+      "preview_artifact": "C:\\Users\\Sarthak\\Desktop\\phaltan\\storage\\projects\\proj_d0da0c680132\\comp_e8b9f6cf0360\\simulations\\opt_8566bb6ed91f\\cand_001\\preview.glb",
+      "provenance": {
+        "solver_name": "scikit-fem steady-state conduction (quadratic tetrahedra)",
+        "solver_version": "skfem-12.0.2",
+        "result_kind": "steady_state_thermal",
+        "analysis_type": "steady_state_thermal",
+        "load_case_id": "steady_state_operating",
+        "degrees_of_freedom": 29279,
+        "mesh_preset": "exploration",
+        "mesh_metadata": {
+          "node_count": 4125,
+          "tet_count": 19047,
+          "boundary_triangle_count": 5558,
+          "target_element_size_m": 0.0010625,
+          "min_element_size_m": 0.00047812500000000003,
+          "fe_element_order": 2,
+          "gmsh_version": "4.15.2",
+          "quality": {
+            "min_quality": 0.09764052697264945,
+            "mean_quality": 0.8082471989039117,
+            "quality_measure": "gamma (inscribed/circumscribed radius ratio)",
+            "poor_element_count": 1,
+            "poor_element_threshold": 0.1
+          },
+          "subdomain_element_counts": {
+            "electrode": 862,
+            "insulator": 6702,
+            "shell": 11483
+          },
+          "warnings": [
+            "1 tetrahedra have quality below 0.1 (minimum 0.098); stress near those elements is less reliable"
+          ]
+        },
+        "mesh_settings": {
+          "target_element_size_m": 0.0010625,
+          "min_element_size_m": 0.00047812500000000003,
+          "element_order": 2,
+          "optimize_quality": true,
+          "max_nodes": 200000
+        },
+        "linear_solver": {
+          "method": "sparse direct factorisation (SuperLU)",
+          "unknowns": 25776,
+          "relative_residual": 7.683855772234758e-15,
+          "iterations": null,
+          "wall_seconds": 4.739161499999682,
+          "fell_back": false,
+          "note": ""
+        },
+        "material_snapshot": {
+          "electrode": {
+            "material_id": "nickel_alloy_electrode",
+            "name": "Nickel-alloy centre-electrode stock",
+            "family": "nickel_alloy",
+            "typical_use": "Spark-plug centre and ground electrode",
+            "density": 8900.0,
+            "elastic_modulus": 207000000000.0,
+            "poisson_ratio": 0.31,
+            "yield_strength": 148000000.0,
+            "ultimate_tensile_strength": 462000000.0,
+            "thermal_conductivity": 90.7,
+            "specific_heat": 444.0,
+            "max_service_temperature": 1273.15,
+            "source_status": "illustrative_handbook_value",
+            "source_document": null,
+            "notes": null,
+            "temperature_dependent_properties": null,
+            "record_version": "1.0.0",
+            "last_reviewed": "2026-11-02"
+          },
+          "insulator": {
+            "material_id": "alumina_96",
+            "name": "96 percent alumina technical ceramic (Al2O3)",
+            "family": "technical_ceramic",
+            "typical_use": "Spark-plug insulator",
+            "density": 3720.0,
+            "elastic_modulus": 300000000000.0,
+            "poisson_ratio": 0.21,
+            "yield_strength": null,
+            "ultimate_tensile_strength": 193000000.0,
+            "thermal_conductivity": 24.7,
+            "specific_heat": 880.0,
+            "max_service_temperature": 1973.15,
+            "source_status": "illustrative_handbook_value",
+            "source_document": null,
+            "notes": "Brittle ceramic: no yield point is defined, so a structural factor of safety against yield is not computed for this material. The thermal properties are the ones used by the spark-plug profile.",
+            "temperature_dependent_properties": null,
+            "record_version": "1.0.0",
+            "last_reviewed": "2026-11-02"
+          },
+          "shell": {
+            "material_id": "steel_low_carbon_shell",
+            "name": "Low-carbon steel spark-plug shell stock",
+            "family": "carbon_steel",
+            "typical_use": "Spark-plug metal shell (threaded body)",
+            "density": 7850.0,
+            "elastic_modulus": 205000000000.0,
+            "poisson_ratio": 0.29,
+            "yield_strength": 250000000.0,
+            "ultimate_tensile_strength": 400000000.0,
+            "thermal_conductivity": 51.9,
+            "specific_heat": 486.0,
+            "max_service_temperature": 873.15,
+            "source_status": "illustrative_handbook_value",
+            "source_document": null,
+            "notes": null,
+            "temperature_dependent_properties": null,
+            "record_version": "1.0.0",
+            "last_reviewed": "2026-11-02"
+          }
+        },
+        "region_applications": [
+          {
+            "region": "combustion_exposed_surfaces",
+            "role": "thermal:convection",
+            "facet_count": 764,
+            "area_m2": 0.0003155945987039314,
+            "note": "h = 500 W/(m2.K) to 900.0 C ambient over 3.16 cm2"
+          },
+          {
+            "region": "cylinder_head_seat",
+            "role": "thermal:fixed_temperature",
+            "facet_count": 1701,
+            "area_m2": 0.0007946163300243353,
+            "note": "temperature held at 150.0 C over 7.95 cm2"
+          },
+          {
+            "region": "terminal_end_surfaces",
+            "role": "thermal:convection",
+            "facet_count": 1128,
+            "area_m2": 0.00047617412377296984,
+            "note": "h = 25 W/(m2.K) to 80.0 C ambient over 4.76 cm2"
+          }
+        ],
+        "load_verifications": [],
+        "method_statement": "3D steady-state Fourier heat-conduction finite-element analysis with 10-node tetrahedra and per-material subdomains, verified against the analytical 1D conduction benchmark. Interfaces between assembled parts are treated as perfectly conducting. It does not model combustion, ignition discharge, cylinder pressure or flow, or any transient engine-cycle behaviour."
+      }
+    },
+    {
+      "candidate_id": "cand_824a26470910",
+      "index": 2,
+      "generation": 0,
+      "label": "Candidate 2",
+      "status": "infeasible",
+      "is_baseline": false,
+      "is_feasible": false,
+      "rank": 5,
+      "pareto_front": null,
+      "parameters": {
+        "thread_major_diameter_m": 0.014,
+        "thread_reach_m": 0.0175,
+        "electrode_gap_m": 0.0008,
+        "electrode_protrusion_m": 0.002,
+        "shell_length_m": 0.022,
+        "insulator_total_length_m": 0.044,
+        "insulator_nose_length_m": 0.005036983629973775,
+        "insulator_diameter_m": 0.005286959333413209,
+        "center_electrode_diameter_m": 0.0023280622726852863,
+        "electrode_length_m": 0.030360925794304616
+      },
+      "geometry_hash": "fc98a072418a2f304ab19a53a90028ff",
+      "metrics": {
+        "mass_kg": {
+          "value": 0.026726238980107772,
+          "unit": "kg",
+          "canonical_value": 0.026726238980107772,
+          "canonical_unit": "kg"
+        },
+        "volume_m3": {
+          "value": 3.811553462181285e-06,
+          "unit": "m3",
+          "canonical_value": 3.811553462181285e-06,
+          "canonical_unit": "m3"
+        },
+        "max_temperature_k": {
+          "value": 377.85580952336545,
+          "unit": "C",
+          "canonical_value": 651.0058095233654,
+          "canonical_unit": "K"
+        },
+        "min_temperature_k": {
+          "value": 136.63627853092504,
+          "unit": "C",
+          "canonical_value": 409.786278530925,
+          "canonical_unit": "K"
+        },
+        "max_temperature_gradient_k_per_m": {
+          "value": 79.68724465439381,
+          "unit": "K/mm",
+          "canonical_value": 79687.24465439381,
+          "canonical_unit": "K/m"
+        },
+        "heat_flow_w": {
+          "value": 19.28643376694534,
+          "unit": "W",
+          "canonical_value": 19.28643376694534,
+          "canonical_unit": "W"
+        },
+        "min_wall_thickness_m": {
+          "value": 1.1640311363426432,
+          "unit": "mm",
+          "canonical_value": 0.0011640311363426432,
+          "canonical_unit": "m"
+        }
+      },
+      "constraint_results": [
+        {
+          "constraint_id": "heat_range_window",
+          "metric": "max_temperature_k",
+          "label": "Firing-end temperature inside the heat-range window",
+          "operator": "between",
+          "description": "max_temperature_k in [723.15 K, 1123.15 K]",
+          "source_status": "user_supplied",
+          "source_reference": "Self-cleaning and pre-ignition limits supplied in engineering setup",
+          "value": {
+            "value": 377.85580952336545,
+            "unit": "C",
+            "canonical_value": 651.0058095233654,
+            "canonical_unit": "K"
+          },
+          "limit": null,
+          "lower": {
+            "value": 450.0,
+            "unit": "C",
+            "canonical_value": 723.15,
+            "canonical_unit": "K"
+          },
+          "upper": {
+            "value": 850.0000000000001,
+            "unit": "C",
+            "canonical_value": 1123.15,
+            "canonical_unit": "K"
+          },
+          "passed": false,
+          "margin_fraction": -0.18036047619158632,
+          "note": null
+        },
+        {
+          "constraint_id": "manufacturing_min_wall",
+          "metric": "min_wall_thickness_m",
+          "label": "Minimum manufacturable section",
+          "operator": "gte",
+          "description": "min_wall_thickness_m >= 1.0 mm",
+          "source_status": "demo_fixture",
+          "source_reference": "Illustrative minimum section for the ceramic insulator wall and shell wall",
+          "value": {
+            "value": 1.1640311363426432,
+            "unit": "mm",
+            "canonical_value": 0.0011640311363426432,
+            "canonical_unit": "m"
+          },
+          "limit": {
+            "value": 1.0,
+            "unit": "mm",
+            "canonical_value": 0.001,
+            "canonical_unit": "m"
+          },
+          "lower": null,
+          "upper": null,
+          "passed": true,
+          "margin_fraction": 0.16403113634264316,
+          "note": null
+        }
+      ],
+      "infeasibility_reasons": [
+        "heat_range_window: max_temperature_k in [723.15 K, 1123.15 K] violated (actual 377.9 C)"
+      ],
+      "failure_stage": null,
+      "failure_reason": null,
+      "warnings": [],
+      "solve_time_seconds": 3.9868332000005466,
+      "mesh_node_count": 3700,
+      "step_artifact": "C:\\Users\\Sarthak\\Desktop\\phaltan\\storage\\projects\\proj_d0da0c680132\\comp_e8b9f6cf0360\\simulations\\opt_8566bb6ed91f\\cand_002\\design.step",
+      "preview_artifact": "C:\\Users\\Sarthak\\Desktop\\phaltan\\storage\\projects\\proj_d0da0c680132\\comp_e8b9f6cf0360\\simulations\\opt_8566bb6ed91f\\cand_002\\preview.glb",
+      "provenance": {
+        "solver_name": "scikit-fem steady-state conduction (quadratic tetrahedra)",
+        "solver_version": "skfem-12.0.2",
+        "result_kind": "steady_state_thermal",
+        "analysis_type": "steady_state_thermal",
+        "load_case_id": "steady_state_operating",
+        "degrees_of_freedom": 25783,
+        "mesh_preset": "exploration",
+        "mesh_metadata": {
+          "node_count": 3700,
+          "tet_count": 16430,
+          "boundary_triangle_count": 5138,
+          "target_element_size_m": 0.0010625,
+          "min_element_size_m": 0.00047812500000000003,
+          "fe_element_order": 2,
+          "gmsh_version": "4.15.2",
+          "quality": {
+            "min_quality": 0.30214039391241587,
+            "mean_quality": 0.8094890289035962,
+            "quality_measure": "gamma (inscribed/circumscribed radius ratio)",
+            "poor_element_count": 0,
+            "poor_element_threshold": 0.1
+          },
+          "subdomain_element_counts": {
+            "electrode": 667,
+            "insulator": 3533,
+            "shell": 12230
+          },
+          "warnings": []
+        },
+        "mesh_settings": {
+          "target_element_size_m": 0.0010625,
+          "min_element_size_m": 0.00047812500000000003,
+          "element_order": 2,
+          "optimize_quality": true,
+          "max_nodes": 200000
+        },
+        "linear_solver": {
+          "method": "sparse direct factorisation (SuperLU)",
+          "unknowns": 22323,
+          "relative_residual": 7.353806791210833e-15,
+          "iterations": null,
+          "wall_seconds": 3.2389615000010963,
+          "fell_back": false,
+          "note": ""
+        },
+        "material_snapshot": {
+          "electrode": {
+            "material_id": "nickel_alloy_electrode",
+            "name": "Nickel-alloy centre-electrode stock",
+            "family": "nickel_alloy",
+            "typical_use": "Spark-plug centre and ground electrode",
+            "density": 8900.0,
+            "elastic_modulus": 207000000000.0,
+            "poisson_ratio": 0.31,
+            "yield_strength": 148000000.0,
+            "ultimate_tensile_strength": 462000000.0,
+            "thermal_conductivity": 90.7,
+            "specific_heat": 444.0,
+            "max_service_temperature": 1273.15,
+            "source_status": "illustrative_handbook_value",
+            "source_document": null,
+            "notes": null,
+            "temperature_dependent_properties": null,
+            "record_version": "1.0.0",
+            "last_reviewed": "2026-11-02"
+          },
+          "insulator": {
+            "material_id": "alumina_96",
+            "name": "96 percent alumina technical ceramic (Al2O3)",
+            "family": "technical_ceramic",
+            "typical_use": "Spark-plug insulator",
+            "density": 3720.0,
+            "elastic_modulus": 300000000000.0,
+            "poisson_ratio": 0.21,
+            "yield_strength": null,
+            "ultimate_tensile_strength": 193000000.0,
+            "thermal_conductivity": 24.7,
+            "specific_heat": 880.0,
+            "max_service_temperature": 1973.15,
+            "source_status": "illustrative_handbook_value",
+            "source_document": null,
+            "notes": "Brittle ceramic: no yield point is defined, so a structural factor of safety against yield is not computed for this material. The thermal properties are the ones used by the spark-plug profile.",
+            "temperature_dependent_properties": null,
+            "record_version": "1.0.0",
+            "last_reviewed": "2026-11-02"
+          },
+          "shell": {
+            "material_id": "steel_low_carbon_shell",
+            "name": "Low-carbon steel spark-plug shell stock",
+            "family": "carbon_steel",
+            "typical_use": "Spark-plug metal shell (threaded body)",
+            "density": 7850.0,
+            "elastic_modulus": 205000000000.0,
+            "poisson_ratio": 0.29,
+            "yield_strength": 250000000.0,
+            "ultimate_tensile_strength": 400000000.0,
+            "thermal_conductivity": 51.9,
+            "specific_heat": 486.0,
+            "max_service_temperature": 873.15,
+            "source_status": "illustrative_handbook_value",
+            "source_document": null,
+            "notes": null,
+            "temperature_dependent_properties": null,
+            "record_version": "1.0.0",
+            "last_reviewed": "2026-11-02"
+          }
+        },
+        "region_applications": [
+          {
+            "region": "combustion_exposed_surfaces",
+            "role": "thermal:convection",
+            "facet_count": 600,
+            "area_m2": 0.0002509217222461161,
+            "note": "h = 500 W/(m2.K) to 900.0 C ambient over 2.51 cm2"
+          },
+          {
+            "region": "cylinder_head_seat",
+            "role": "thermal:fixed_temperature",
+            "facet_count": 1674,
+            "area_m2": 0.0007795964947937817,
+            "note": "temperature held at 150.0 C over 7.80 cm2"
+          },
+          {
+            "region": "terminal_end_surfaces",
+            "role": "thermal:convection",
+            "facet_count": 1226,
+            "area_m2": 0.000545213203214352,
+            "note": "h = 25 W/(m2.K) to 80.0 C ambient over 5.45 cm2"
+          }
+        ],
+        "load_verifications": [],
+        "method_statement": "3D steady-state Fourier heat-conduction finite-element analysis with 10-node tetrahedra and per-material subdomains, verified against the analytical 1D conduction benchmark. Interfaces between assembled parts are treated as perfectly conducting. It does not model combustion, ignition discharge, cylinder pressure or flow, or any transient engine-cycle behaviour."
+      }
+    },
+    {
+      "candidate_id": "cand_511114c42fa8",
+      "index": 3,
+      "generation": 0,
+      "label": "Candidate 3",
+      "status": "feasible",
+      "is_baseline": false,
+      "is_feasible": true,
+      "rank": 3,
+      "pareto_front": 2,
+      "parameters": {
+        "thread_major_diameter_m": 0.014,
+        "thread_reach_m": 0.0175,
+        "electrode_gap_m": 0.0008,
+        "electrode_protrusion_m": 0.002,
+        "shell_length_m": 0.022,
+        "insulator_total_length_m": 0.044,
+        "insulator_nose_length_m": 0.014491370794153326,
+        "insulator_diameter_m": 0.007097294639649003,
+        "center_electrode_diameter_m": 0.002831046684453526,
+        "electrode_length_m": 0.03747499441744223
+      },
+      "geometry_hash": "7b87835e997a5a3e51771562ba67f4fb",
+      "metrics": {
+        "mass_kg": {
+          "value": 0.027156246715272666,
+          "unit": "kg",
+          "canonical_value": 0.027156246715272666,
+          "canonical_unit": "kg"
+        },
+        "volume_m3": {
+          "value": 4.215921700375516e-06,
+          "unit": "m3",
+          "canonical_value": 4.215921700375516e-06,
+          "canonical_unit": "m3"
+        },
+        "max_temperature_k": {
+          "value": 635.6276507547939,
+          "unit": "C",
+          "canonical_value": 908.7776507547939,
+          "canonical_unit": "K"
+        },
+        "min_temperature_k": {
+          "value": 146.86604995365826,
+          "unit": "C",
+          "canonical_value": 420.01604995365824,
+          "canonical_unit": "K"
+        },
+        "max_temperature_gradient_k_per_m": {
+          "value": 114.67892592824947,
+          "unit": "K/mm",
+          "canonical_value": 114678.92592824947,
+          "canonical_unit": "K/m"
+        },
+        "heat_flow_w": {
+          "value": 55.509930312819804,
+          "unit": "W",
+          "canonical_value": 55.509930312819804,
+          "canonical_unit": "W"
+        },
+        "min_wall_thickness_m": {
+          "value": 1.4155233422267628,
+          "unit": "mm",
+          "canonical_value": 0.001415523342226763,
+          "canonical_unit": "m"
+        }
+      },
+      "constraint_results": [
+        {
+          "constraint_id": "heat_range_window",
+          "metric": "max_temperature_k",
+          "label": "Firing-end temperature inside the heat-range window",
+          "operator": "between",
+          "description": "max_temperature_k in [723.15 K, 1123.15 K]",
+          "source_status": "user_supplied",
+          "source_reference": "Self-cleaning and pre-ignition limits supplied in engineering setup",
+          "value": {
+            "value": 635.6276507547939,
+            "unit": "C",
+            "canonical_value": 908.7776507547939,
+            "canonical_unit": "K"
+          },
+          "limit": null,
+          "lower": {
+            "value": 450.0,
+            "unit": "C",
+            "canonical_value": 723.15,
+            "canonical_unit": "K"
+          },
+          "upper": {
+            "value": 850.0000000000001,
+            "unit": "C",
+            "canonical_value": 1123.15,
+            "canonical_unit": "K"
+          },
+          "passed": true,
+          "margin_fraction": 0.46406912688698454,
+          "note": null
+        },
+        {
+          "constraint_id": "manufacturing_min_wall",
+          "metric": "min_wall_thickness_m",
+          "label": "Minimum manufacturable section",
+          "operator": "gte",
+          "description": "min_wall_thickness_m >= 1.0 mm",
+          "source_status": "demo_fixture",
+          "source_reference": "Illustrative minimum section for the ceramic insulator wall and shell wall",
+          "value": {
+            "value": 1.4155233422267628,
+            "unit": "mm",
+            "canonical_value": 0.001415523342226763,
+            "canonical_unit": "m"
+          },
+          "limit": {
+            "value": 1.0,
+            "unit": "mm",
+            "canonical_value": 0.001,
+            "canonical_unit": "m"
+          },
+          "lower": null,
+          "upper": null,
+          "passed": true,
+          "margin_fraction": 0.41552334222676285,
+          "note": null
+        }
+      ],
+      "infeasibility_reasons": [],
+      "failure_stage": null,
+      "failure_reason": null,
+      "warnings": [
+        "Peak computed temperature 636 C exceeds the catalog service limit of: Low-carbon steel spark-plug shell stock (limit 600 C), Low-carbon steel spark-plug shell stock (limit 600 C). The conduction solution is still valid, but the material selection is not."
+      ],
+      "solve_time_seconds": 7.00115420000111,
+      "mesh_node_count": 4289,
+      "step_artifact": "C:\\Users\\Sarthak\\Desktop\\phaltan\\storage\\projects\\proj_d0da0c680132\\comp_e8b9f6cf0360\\simulations\\opt_8566bb6ed91f\\cand_003\\design.step",
+      "preview_artifact": "C:\\Users\\Sarthak\\Desktop\\phaltan\\storage\\projects\\proj_d0da0c680132\\comp_e8b9f6cf0360\\simulations\\opt_8566bb6ed91f\\cand_003\\preview.glb",
+      "provenance": {
+        "solver_name": "scikit-fem steady-state conduction (quadratic tetrahedra)",
+        "solver_version": "skfem-12.0.2",
+        "result_kind": "steady_state_thermal",
+        "analysis_type": "steady_state_thermal",
+        "load_case_id": "steady_state_operating",
+        "degrees_of_freedom": 30356,
+        "mesh_preset": "exploration",
+        "mesh_metadata": {
+          "node_count": 4289,
+          "tet_count": 19699,
+          "boundary_triangle_count": 5912,
+          "target_element_size_m": 0.0010625,
+          "min_element_size_m": 0.00047812500000000003,
+          "fe_element_order": 2,
+          "gmsh_version": "4.15.2",
+          "quality": {
+            "min_quality": 0.2987929272219935,
+            "mean_quality": 0.8157849437611879,
+            "quality_measure": "gamma (inscribed/circumscribed radius ratio)",
+            "poor_element_count": 0,
+            "poor_element_threshold": 0.1
+          },
+          "subdomain_element_counts": {
+            "electrode": 1081,
+            "insulator": 7370,
+            "shell": 11248
+          },
+          "warnings": []
+        },
+        "mesh_settings": {
+          "target_element_size_m": 0.0010625,
+          "min_element_size_m": 0.00047812500000000003,
+          "element_order": 2,
+          "optimize_quality": true,
+          "max_nodes": 200000
+        },
+        "linear_solver": {
+          "method": "sparse direct factorisation (SuperLU)",
+          "unknowns": 26886,
+          "relative_residual": 7.921990364251739e-15,
+          "iterations": null,
+          "wall_seconds": 6.122881600000255,
+          "fell_back": false,
+          "note": ""
+        },
+        "material_snapshot": {
+          "electrode": {
+            "material_id": "nickel_alloy_electrode",
+            "name": "Nickel-alloy centre-electrode stock",
+            "family": "nickel_alloy",
+            "typical_use": "Spark-plug centre and ground electrode",
+            "density": 8900.0,
+            "elastic_modulus": 207000000000.0,
+            "poisson_ratio": 0.31,
+            "yield_strength": 148000000.0,
+            "ultimate_tensile_strength": 462000000.0,
+            "thermal_conductivity": 90.7,
+            "specific_heat": 444.0,
+            "max_service_temperature": 1273.15,
+            "source_status": "illustrative_handbook_value",
+            "source_document": null,
+            "notes": null,
+            "temperature_dependent_properties": null,
+            "record_version": "1.0.0",
+            "last_reviewed": "2026-11-02"
+          },
+          "insulator": {
+            "material_id": "alumina_96",
+            "name": "96 percent alumina technical ceramic (Al2O3)",
+            "family": "technical_ceramic",
+            "typical_use": "Spark-plug insulator",
+            "density": 3720.0,
+            "elastic_modulus": 300000000000.0,
+            "poisson_ratio": 0.21,
+            "yield_strength": null,
+            "ultimate_tensile_strength": 193000000.0,
+            "thermal_conductivity": 24.7,
+            "specific_heat": 880.0,
+            "max_service_temperature": 1973.15,
+            "source_status": "illustrative_handbook_value",
+            "source_document": null,
+            "notes": "Brittle ceramic: no yield point is defined, so a structural factor of safety against yield is not computed for this material. The thermal properties are the ones used by the spark-plug profile.",
+            "temperature_dependent_properties": null,
+            "record_version": "1.0.0",
+            "last_reviewed": "2026-11-02"
+          },
+          "shell": {
+            "material_id": "steel_low_carbon_shell",
+            "name": "Low-carbon steel spark-plug shell stock",
+            "family": "carbon_steel",
+            "typical_use": "Spark-plug metal shell (threaded body)",
+            "density": 7850.0,
+            "elastic_modulus": 205000000000.0,
+            "poisson_ratio": 0.29,
+            "yield_strength": 250000000.0,
+            "ultimate_tensile_strength": 400000000.0,
+            "thermal_conductivity": 51.9,
+            "specific_heat": 486.0,
+            "max_service_temperature": 873.15,
+            "source_status": "illustrative_handbook_value",
+            "source_document": null,
+            "notes": null,
+            "temperature_dependent_properties": null,
+            "record_version": "1.0.0",
+            "last_reviewed": "2026-11-02"
+          }
+        },
+        "region_applications": [
+          {
+            "region": "combustion_exposed_surfaces",
+            "role": "thermal:convection",
+            "facet_count": 1140,
+            "area_m2": 0.000493161837447438,
+            "note": "h = 500 W/(m2.K) to 900.0 C ambient over 4.93 cm2"
+          },
+          {
+            "region": "cylinder_head_seat",
+            "role": "thermal:fixed_temperature",
+            "facet_count": 1678,
+            "area_m2": 0.0007824996293118436,
+            "note": "temperature held at 150.0 C over 7.82 cm2"
+          },
+          {
+            "region": "terminal_end_surfaces",
+            "role": "thermal:convection",
+            "facet_count": 907,
+            "area_m2": 0.0003811636593583842,
+            "note": "h = 25 W/(m2.K) to 80.0 C ambient over 3.81 cm2"
+          }
+        ],
+        "load_verifications": [],
+        "method_statement": "3D steady-state Fourier heat-conduction finite-element analysis with 10-node tetrahedra and per-material subdomains, verified against the analytical 1D conduction benchmark. Interfaces between assembled parts are treated as perfectly conducting. It does not model combustion, ignition discharge, cylinder pressure or flow, or any transient engine-cycle behaviour."
+      }
+    },
+    {
+      "candidate_id": "cand_790bcb7c3a31",
+      "index": 4,
+      "generation": 0,
+      "label": "Candidate 4",
+      "status": "feasible",
+      "is_baseline": false,
+      "is_feasible": true,
+      "rank": 2,
+      "pareto_front": 1,
+      "parameters": {
+        "thread_major_diameter_m": 0.014,
+        "thread_reach_m": 0.0175,
+        "electrode_gap_m": 0.0008,
+        "electrode_protrusion_m": 0.002,
+        "shell_length_m": 0.022,
+        "insulator_total_length_m": 0.044,
+        "insulator_nose_length_m": 0.011457180561768771,
+        "insulator_diameter_m": 0.008071594801697562,
+        "center_electrode_diameter_m": 0.003490434504542006,
+        "electrode_length_m": 0.021638169687680845
+      },
+      "geometry_hash": "8925f4f165fb2e67dcb158e5c564f68f",
+      "metrics": {
+        "mass_kg": {
+          "value": 0.026317058096432533,
+          "unit": "kg",
+          "canonical_value": 0.026317058096432533,
+          "canonical_unit": "kg"
+        },
+        "volume_m3": {
+          "value": 4.2983875322372136e-06,
+          "unit": "m3",
+          "canonical_value": 4.2983875322372136e-06,
+          "canonical_unit": "m3"
+        },
+        "max_temperature_k": {
+          "value": 536.4930526585064,
+          "unit": "C",
+          "canonical_value": 809.6430526585063,
+          "canonical_unit": "K"
+        },
+        "min_temperature_k": {
+          "value": 144.800302941481,
+          "unit": "C",
+          "canonical_value": 417.95030294148097,
+          "canonical_unit": "K"
+        },
+        "max_temperature_gradient_k_per_m": {
+          "value": 102.62073001839336,
+          "unit": "K/mm",
+          "canonical_value": 102620.73001839335,
+          "canonical_unit": "K/m"
+        },
+        "heat_flow_w": {
+          "value": 60.83626690385279,
+          "unit": "W",
+          "canonical_value": 60.83626690385279,
+          "canonical_unit": "W"
+        },
+        "min_wall_thickness_m": {
+          "value": 1.745217252271003,
+          "unit": "mm",
+          "canonical_value": 0.001745217252271003,
+          "canonical_unit": "m"
+        }
+      },
+      "constraint_results": [
+        {
+          "constraint_id": "heat_range_window",
+          "metric": "max_temperature_k",
+          "label": "Firing-end temperature inside the heat-range window",
+          "operator": "between",
+          "description": "max_temperature_k in [723.15 K, 1123.15 K]",
+          "source_status": "user_supplied",
+          "source_reference": "Self-cleaning and pre-ignition limits supplied in engineering setup",
+          "value": {
+            "value": 536.4930526585064,
+            "unit": "C",
+            "canonical_value": 809.6430526585063,
+            "canonical_unit": "K"
+          },
+          "limit": null,
+          "lower": {
+            "value": 450.0,
+            "unit": "C",
+            "canonical_value": 723.15,
+            "canonical_unit": "K"
+          },
+          "upper": {
+            "value": 850.0000000000001,
+            "unit": "C",
+            "canonical_value": 1123.15,
+            "canonical_unit": "K"
+          },
+          "passed": true,
+          "margin_fraction": 0.21623263164626585,
+          "note": null
+        },
+        {
+          "constraint_id": "manufacturing_min_wall",
+          "metric": "min_wall_thickness_m",
+          "label": "Minimum manufacturable section",
+          "operator": "gte",
+          "description": "min_wall_thickness_m >= 1.0 mm",
+          "source_status": "demo_fixture",
+          "source_reference": "Illustrative minimum section for the ceramic insulator wall and shell wall",
+          "value": {
+            "value": 1.745217252271003,
+            "unit": "mm",
+            "canonical_value": 0.001745217252271003,
+            "canonical_unit": "m"
+          },
+          "limit": {
+            "value": 1.0,
+            "unit": "mm",
+            "canonical_value": 0.001,
+            "canonical_unit": "m"
+          },
+          "lower": null,
+          "upper": null,
+          "passed": true,
+          "margin_fraction": 0.745217252271003,
+          "note": null
+        }
+      ],
+      "infeasibility_reasons": [],
+      "failure_stage": null,
+      "failure_reason": null,
+      "warnings": [],
+      "solve_time_seconds": 5.986011300001337,
+      "mesh_node_count": 4415,
+      "step_artifact": "C:\\Users\\Sarthak\\Desktop\\phaltan\\storage\\projects\\proj_d0da0c680132\\comp_e8b9f6cf0360\\simulations\\opt_8566bb6ed91f\\cand_004\\design.step",
+      "preview_artifact": "C:\\Users\\Sarthak\\Desktop\\phaltan\\storage\\projects\\proj_d0da0c680132\\comp_e8b9f6cf0360\\simulations\\opt_8566bb6ed91f\\cand_004\\preview.glb",
+      "provenance": {
+        "solver_name": "scikit-fem steady-state conduction (quadratic tetrahedra)",
+        "solver_version": "skfem-12.0.2",
+        "result_kind": "steady_state_thermal",
+        "analysis_type": "steady_state_thermal",
+        "load_case_id": "steady_state_operating",
+        "degrees_of_freedom": 30852,
+        "mesh_preset": "exploration",
+        "mesh_metadata": {
+          "node_count": 4415,
+          "tet_count": 19661,
+          "boundary_triangle_count": 6408,
+          "target_element_size_m": 0.0010625,
+          "min_element_size_m": 0.00047812500000000003,
+          "fe_element_order": 2,
+          "gmsh_version": "4.15.2",
+          "quality": {
+            "min_quality": 0.2567066135526284,
+            "mean_quality": 0.8088347897982938,
+            "quality_measure": "gamma (inscribed/circumscribed radius ratio)",
+            "poor_element_count": 0,
+            "poor_element_threshold": 0.1
+          },
+          "subdomain_element_counts": {
+            "electrode": 993,
+            "insulator": 8629,
+            "shell": 10039
+          },
+          "warnings": []
+        },
+        "mesh_settings": {
+          "target_element_size_m": 0.0010625,
+          "min_element_size_m": 0.00047812500000000003,
+          "element_order": 2,
+          "optimize_quality": true,
+          "max_nodes": 200000
+        },
+        "linear_solver": {
+          "method": "sparse direct factorisation (SuperLU)",
+          "unknowns": 27405,
+          "relative_residual": 8.151421617879666e-15,
+          "iterations": null,
+          "wall_seconds": 4.9688775000013266,
+          "fell_back": false,
+          "note": ""
+        },
+        "material_snapshot": {
+          "electrode": {
+            "material_id": "nickel_alloy_electrode",
+            "name": "Nickel-alloy centre-electrode stock",
+            "family": "nickel_alloy",
+            "typical_use": "Spark-plug centre and ground electrode",
+            "density": 8900.0,
+            "elastic_modulus": 207000000000.0,
+            "poisson_ratio": 0.31,
+            "yield_strength": 148000000.0,
+            "ultimate_tensile_strength": 462000000.0,
+            "thermal_conductivity": 90.7,
+            "specific_heat": 444.0,
+            "max_service_temperature": 1273.15,
+            "source_status": "illustrative_handbook_value",
+            "source_document": null,
+            "notes": null,
+            "temperature_dependent_properties": null,
+            "record_version": "1.0.0",
+            "last_reviewed": "2026-11-02"
+          },
+          "insulator": {
+            "material_id": "alumina_96",
+            "name": "96 percent alumina technical ceramic (Al2O3)",
+            "family": "technical_ceramic",
+            "typical_use": "Spark-plug insulator",
+            "density": 3720.0,
+            "elastic_modulus": 300000000000.0,
+            "poisson_ratio": 0.21,
+            "yield_strength": null,
+            "ultimate_tensile_strength": 193000000.0,
+            "thermal_conductivity": 24.7,
+            "specific_heat": 880.0,
+            "max_service_temperature": 1973.15,
+            "source_status": "illustrative_handbook_value",
+            "source_document": null,
+            "notes": "Brittle ceramic: no yield point is defined, so a structural factor of safety against yield is not computed for this material. The thermal properties are the ones used by the spark-plug profile.",
+            "temperature_dependent_properties": null,
+            "record_version": "1.0.0",
+            "last_reviewed": "2026-11-02"
+          },
+          "shell": {
+            "material_id": "steel_low_carbon_shell",
+            "name": "Low-carbon steel spark-plug shell stock",
+            "family": "carbon_steel",
+            "typical_use": "Spark-plug metal shell (threaded body)",
+            "density": 7850.0,
+            "elastic_modulus": 205000000000.0,
+            "poisson_ratio": 0.29,
+            "yield_strength": 250000000.0,
+            "ultimate_tensile_strength": 400000000.0,
+            "thermal_conductivity": 51.9,
+            "specific_heat": 486.0,
+            "max_service_temperature": 873.15,
+            "source_status": "illustrative_handbook_value",
+            "source_document": null,
+            "notes": null,
+            "temperature_dependent_properties": null,
+            "record_version": "1.0.0",
+            "last_reviewed": "2026-11-02"
+          }
+        },
+        "region_applications": [
+          {
+            "region": "combustion_exposed_surfaces",
+            "role": "thermal:convection",
+            "facet_count": 1072,
+            "area_m2": 0.00046498513677946076,
+            "note": "h = 500 W/(m2.K) to 900.0 C ambient over 4.65 cm2"
+          },
+          {
+            "region": "cylinder_head_seat",
+            "role": "thermal:fixed_temperature",
+            "facet_count": 1669,
+            "area_m2": 0.0007787485929378422,
+            "note": "temperature held at 150.0 C over 7.79 cm2"
+          },
+          {
+            "region": "terminal_end_surfaces",
+            "role": "thermal:convection",
+            "facet_count": 1207,
+            "area_m2": 0.0005240325972478007,
+            "note": "h = 25 W/(m2.K) to 80.0 C ambient over 5.24 cm2"
+          }
+        ],
+        "load_verifications": [],
+        "method_statement": "3D steady-state Fourier heat-conduction finite-element analysis with 10-node tetrahedra and per-material subdomains, verified against the analytical 1D conduction benchmark. Interfaces between assembled parts are treated as perfectly conducting. It does not model combustion, ignition discharge, cylinder pressure or flow, or any transient engine-cycle behaviour."
+      }
+    }
+  ],
+  "narrative": {
+    "generator": "deterministic_template",
+    "headline": "5 design(s) generated, 5 evaluated by the solver, 3 feasible under the configured constraints.",
+    "paragraphs": [
+      "The design space was searched with seeded Latin-hypercube design of experiments. Every candidate was built by the parametric CAD generator, meshed, and solved with the same solver configuration before being judged, so the comparison between them is like-for-like.",
+      "Candidate 4 is the best feasible generated design, but it does not beat the baseline on max_temperature_k (728.8 to 809.6). Every candidate that reached a lower value violated a constraint. The baseline remains the best feasible design in the space searched so far.",
+      "Recommended design against the baseline: mass 0.02671 to 0.02632 kg (-1.5%); peak temperature 455.6 to 536.5 C (+11.1%); minimum temperature 140.6 to 144.8 C (+1.0%); peak temperature gradient 95.55 to 102.6 K/mm (+7.4%); heat flow through the sink surfaces 33.96 to 60.84 W (+79.1%).",
+      "Constraints that ruled candidates out: Minimum manufacturable section (1), Firing-end temperature inside the heat-range window (1)."
+    ],
+    "grounded_facts": [],
+    "constraint_statements": [],
+    "caveats": [
+      "Mean solver time per candidate was 5.7 s; the whole study took 46 s.",
+      "Re-solving the recommended design on a refined mesh (4415 to 6257 nodes) changed every reported metric by at most 6.0%, within the 10% tolerance, and the feasibility verdict is unchanged. The result is mesh-converged for these metrics.",
+      "These are virtual-prototyping predictions under the model you configured. They narrow down which designs are worth building; they do not replace physical testing or any approval your process requires."
+    ],
+    "method_statement": "3D steady-state Fourier heat-conduction finite-element analysis with 10-node tetrahedra and per-material subdomains, verified against the analytical 1D conduction benchmark. Interfaces between assembled parts are treated as perfectly conducting. It does not model combustion, ignition discharge, cylinder pressure or flow, or any transient engine-cycle behaviour."
+  },
+  "assumptions": [
+    {
+      "key": "combustion_boundary_demo_fixture",
+      "statement": "The default thermal load - 900 C gas at a 500 W/(m2.K) film coefficient on the firing end - is a demonstration fixture. Real values depend on the engine, the operating point and the duty cycle. The film coefficient in particular is the most uncertain input in this model and the computed temperatures scale strongly with it.",
+      "source_status": "demo_fixture",
+      "source_reference": null,
+      "requires_confirmation": true,
+      "confirmed": false
+    },
+    {
+      "key": "steady_state_only",
+      "statement": "This is a steady-state solution: it represents a sustained operating condition, not a warm-up, a transient load change or any part of the engine cycle. Cyclic peak surface temperatures are higher than a steady-state average.",
+      "source_status": "demo_fixture",
+      "source_reference": null,
+      "requires_confirmation": true,
+      "confirmed": false
+    },
+    {
+      "key": "head_temperature_demo_fixture",
+      "statement": "The 150 C default cylinder-head seat temperature is a demonstration fixture and is applied as a fixed temperature, which assumes the head is an ideal sink with no contact resistance at the seat.",
+      "source_status": "demo_fixture",
+      "source_reference": null,
+      "requires_confirmation": true,
+      "confirmed": false
+    },
+    {
+      "key": "heat_range_window_demo_fixture",
+      "statement": "The 450 C to 850 C operating window is the commonly cited self-cleaning to pre-ignition range for a spark plug firing end. It is entered here as a demonstration fixture, not as a specification from a plug or engine manufacturer. Confirm the window that applies to your application.",
+      "source_status": "demo_fixture",
+      "source_reference": null,
+      "requires_confirmation": true,
+      "confirmed": false
+    },
+    {
+      "key": "perfect_interfaces",
+      "statement": "The shell, insulator and electrode are modelled as perfectly bonded, so no contact thermal resistance is included at their interfaces. Real assemblies have some resistance, which would raise the computed firing-end temperature.",
+      "source_status": "demo_fixture",
+      "source_reference": null,
+      "requires_confirmation": false,
+      "confirmed": false
+    },
+    {
+      "key": "geometry_simplification",
+      "statement": "Simplified three-part spark-plug thermal template: centre electrode, ceramic insulator and metal shell as concentric solids of revolution with perfectly conducting interfaces. The hex, terminal, ground electrode arm, internal resistor, seals, gasket, thread form and precious-metal tips are not modelled. Thread major diameter, reach, seat position and electrode gap are preserved interfaces and cannot be changed by the optimizer.",
+      "source_status": "demo_fixture",
+      "source_reference": null,
+      "requires_confirmation": false,
+      "confirmed": false
+    }
+  ],
+  "standing_limitations": [
+    "This report contains virtual-prototyping predictions produced under the engineering model recorded below. It is not a regulatory certification, not an approval for road use, and not a substitute for physical validation.",
+    "A candidate marked 'feasible under configured model' satisfied the constraints listed in this report and nothing more.",
+    "Material properties are taken from the catalog snapshot recorded with each run. Where a record is tagged 'illustrative_handbook_value' it is not supplier-certified data and must be replaced before any engineering sign-off.",
+    "Candidates that failed geometry generation, meshing or the solver carry no metrics. They are listed with their failure stage and reason rather than omitted."
+  ],
+  "recommended_design": {
+    "candidate_id": "cand_790bcb7c3a31",
+    "parameters": {
+      "thread_major_diameter_m": 0.014,
+      "thread_reach_m": 0.0175,
+      "electrode_gap_m": 0.0008,
+      "electrode_protrusion_m": 0.002,
+      "shell_length_m": 0.022,
+      "insulator_total_length_m": 0.044,
+      "insulator_nose_length_m": 0.011457180561768771,
+      "insulator_diameter_m": 0.008071594801697562,
+      "center_electrode_diameter_m": 0.003490434504542006,
+      "electrode_length_m": 0.021638169687680845
+    },
+    "metrics": {
+      "mass_kg": {
+        "value": 0.026317058096432533,
+        "unit": "kg",
+        "canonical_value": 0.026317058096432533,
+        "canonical_unit": "kg"
+      },
+      "volume_m3": {
+        "value": 4.2983875322372136e-06,
+        "unit": "m3",
+        "canonical_value": 4.2983875322372136e-06,
+        "canonical_unit": "m3"
+      },
+      "max_temperature_k": {
+        "value": 536.4930526585064,
+        "unit": "C",
+        "canonical_value": 809.6430526585063,
+        "canonical_unit": "K"
+      },
+      "min_temperature_k": {
+        "value": 144.800302941481,
+        "unit": "C",
+        "canonical_value": 417.95030294148097,
+        "canonical_unit": "K"
+      },
+      "max_temperature_gradient_k_per_m": {
+        "value": 102.62073001839336,
+        "unit": "K/mm",
+        "canonical_value": 102620.73001839335,
+        "canonical_unit": "K/m"
+      },
+      "heat_flow_w": {
+        "value": 60.83626690385279,
+        "unit": "W",
+        "canonical_value": 60.83626690385279,
+        "canonical_unit": "W"
+      },
+      "min_wall_thickness_m": {
+        "value": 1.745217252271003,
+        "unit": "mm",
+        "canonical_value": 0.001745217252271003,
+        "canonical_unit": "m"
+      }
+    },
+    "step_artifact": "C:\\Users\\Sarthak\\Desktop\\phaltan\\storage\\projects\\proj_d0da0c680132\\comp_e8b9f6cf0360\\simulations\\opt_8566bb6ed91f\\cand_004\\design.step",
+    "next_steps": [
+      "Review every assumption listed in this report and replace the demonstration fixtures with your own engineering values.",
+      "Replace illustrative material data with supplier-certified properties and re-run.",
+      "Re-run the selected design at verification mesh fidelity if that has not already been done.",
+      "Add the load cases this study did not cover before committing to a physical prototype.",
+      "Build and physically test the selected design. This study narrows the candidates; it does not replace that test."
+    ]
+  }
+}

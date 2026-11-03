@@ -43,6 +43,9 @@ labels clearly which numbers are inputs, which are derived and which are estimat
     Design tab is badged *Drawing*, *Interpreted*, *Assumed* or *Derived*.
   - Manoeuvres: handling loop, cruise, steady cornering, brake to a stop, or drive it
     yourself with the arrow keys and Space.
+  - Two bench tests: cornering fatigue (bare wheel on a shaft under a rotating
+    bending moment) and radial fatigue (tyred wheel on a drum). Each shows estimated
+    cycles to failure against a target, with a meets / below-target verdict.
   - Load transfer, a friction-circle grip limit, a pressure-dependent tyre that flattens
     at the contact patch, and Fz/Fy/Fx arrows.
   - Spoke stresses coloured on every vertex (beam estimate, scaled to the fatigue
@@ -50,6 +53,13 @@ labels clearly which numbers are inputs, which are derived and which are estimat
   - Wheel mass and inertia from the geometry, for three materials.
   - Section A-A cut, exploded view, and a "Build from drawing" sequence that assembles
     the wheel step by step with the drawing callouts.
+  - **Design Lab for the wheel** (pick *Alloy Wheel* in the Design Lab switch): the
+    drawing as design A next to candidate B. It has a front-view outline overlay,
+    mass, inertia, peak stress in a design turn, and life on both rigs. Four checks
+    give PASS / NEEDS REVIEW / FAIL: stress against yield/FoS, the two rig lives,
+    and a castable minimum section. "Drive B in twin" loads the candidate into
+    the live twin. The wheel keeps its own A/B store (`src/modules/alloyWheel/lab/`),
+    separate from the caliper/plug workspace.
 - **Brake Caliper twin:**
   - Hydraulic pressure lag, piston and pad travel, and clamp force.
   - Brake torque, tyre-force limit, wheel deceleration and rotor temperature.
@@ -216,6 +226,12 @@ front-left wheel of a car:
 - Rim hoop stress `p·r/t` plus `ρω²r²`.
 - Fatigue: each spoke sees one cycle per turn, assessed with Basquin, Goodman and
   Miner on illustrative constants. It ranks conditions; it is not a life prediction.
+- Test rigs replace the car. Cornering fatigue applies `M = (μ·R + d)·Fv·S` through
+  the hub with no tyre (defaults μ 0.7, S 1.6, target 10⁵ cycles), giving a fully
+  reversed cycle. Radial fatigue applies `Fr = K·Fv` through the tyre onto a drum
+  (defaults K 2.25, target 5×10⁵ cycles). The form follows common wheel-standard
+  practice, but the factors and targets are labelled assumptions, not values from
+  a standard. The drawn design gives about 5×10⁵ cycles on the cornering rig.
 
 The wheel steps in 2 ms of simulated time. Mass and polar inertia are integrated
 exactly from the drawn profiles (11.9 kg in A356-T6). The drawing's title block names
@@ -267,7 +283,7 @@ It is an illustrative visual envelope, not a heat-release or flame-propagation m
 - Optional CAD import: a GLB display mesh mapped onto the animated part groups.
 - A solver back end for meshing and thermal/structural FEA. Its results would replace
   the *Demo fixture* inputs.
-- Alloy wheel in the workspace (Design Lab, Experiment, AI Insights), and standard
-  test-rig scenarios: cornering fatigue (rotating bending) and radial fatigue (drum).
+- Alloy wheel in Experiment, AI Insights and Reports. The Design Lab already has it,
+  through its own A/B store.
 - Drive the wheel's stress colours from the backend's scikit-fem field instead of the
   beam estimate.

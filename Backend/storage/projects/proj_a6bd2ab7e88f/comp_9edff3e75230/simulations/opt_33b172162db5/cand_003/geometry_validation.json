@@ -1,0 +1,49 @@
+{
+  "passed": true,
+  "metrics": {
+    "volume_m3": 0.0008320967477538441,
+    "surface_area_m2": 0.08346053200386822,
+    "bounding_box_min_m": [
+      -0.065,
+      -0.03948092938484224,
+      0.0
+    ],
+    "bounding_box_max_m": [
+      0.065,
+      0.03948092938484224,
+      0.11002181026783206
+    ],
+    "solid_count": 1,
+    "is_valid_solid": true,
+    "min_wall_thickness_m": 0.007868325284694782,
+    "min_wall_thickness_basis": "parameter_derived"
+  },
+  "preserved_interface_checks": [
+    {
+      "name": "overall_length",
+      "description": "Body length measured across the tessellated solid (X extent)",
+      "expected_value_m": 0.13,
+      "measured_value_m": 0.13,
+      "tolerance_m": 0.001,
+      "passed": true
+    },
+    {
+      "name": "overall_height",
+      "description": "Axial width measured across the tessellated solid (build Y extent)",
+      "expected_value_m": 0.07896185876968448,
+      "measured_value_m": 0.07896185876968448,
+      "tolerance_m": 0.001,
+      "passed": true
+    },
+    {
+      "name": "overall_width",
+      "description": "Radial body height measured across the tessellated solid (Z extent)",
+      "expected_value_m": 0.11002181026783206,
+      "measured_value_m": 0.11002181026783206,
+      "tolerance_m": 0.001,
+      "passed": true
+    }
+  ],
+  "errors": [],
+  "warnings": []
+}

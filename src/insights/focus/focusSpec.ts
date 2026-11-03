@@ -46,6 +46,11 @@ const PARTS_OF: Record<string, PartId[]> = {
   materialId: ['body'],
 };
 
+/** The model parts that a set of parameters changes (for highlighting). */
+export function partsOf(keys: string[]): PartId[] {
+  return [...new Set(keys.flatMap((k) => PARTS_OF[k] ?? []))];
+}
+
 export interface FocusRequest {
   title: string;
   patch: Patch;

@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { SolverRunPanel } from '../api/SolverRunPanel';
 import { navigate } from '../app/routes';
 import { FocusViewer } from '../insights/focus/FocusViewer';
 import { abFocus } from '../insights/focus/focusSpec';
@@ -178,6 +179,9 @@ export function ExperimentPage() {
           <RunHistory ws={ws} runs={runs} selectedId={shown?.id ?? null} onSelect={setSelectedId} />
         </div>
       </div>
+
+      {/* Slow, real CAD → mesh → FEA study on the backend; separate from the instant A/B bench above. */}
+      <SolverRunPanel component={c} />
     </div>
   );
 }

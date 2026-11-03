@@ -1,5 +1,8 @@
 import { navigate } from '../app/routes';
-import { ComponentSwitch } from '../shell/ComponentSwitch';
+import { ModuleSwitch } from '../shell/ModuleSwitch';
+import type { ModuleId } from '../shell/ModuleSwitch';
+import { WheelDesignLab } from '../modules/alloyWheel/lab/WheelDesignLab';
+import { useWheelLab } from '../modules/alloyWheel/lab/WheelLabStore';
 import { Badge, Panel, SliderField, fmt } from '../ui/primitives';
 import {
   CALIPER_INPUT_SPECS,
@@ -19,6 +22,7 @@ import { useWorkspace } from '../workspace/useWorkspace';
 import type { WorkspaceStore } from '../workspace/WorkspaceStore';
 import type { Verdict } from '../workspace/validation';
 import { ChecksList, DeltaCell } from './shared';
+import { LabAB3D } from './LabAB3D';
 
 const VERDICT_SHORT: Record<Verdict, string> = { pass: 'pass', review: 'review', fail: 'fail' };
 
@@ -33,7 +37,19 @@ const ANALYSIS: Record<ComponentId, string> = {
  */
 export function DesignLabPage() {
   const ws = useWorkspace();
+  const wheelLab = useWheelLab();
   const c = ws.component;
+
+  // The alloy wheel has its own A/B store (src/modules/alloyWheel/lab); the caliper and
+  // plug keep using the workspace. The switch here offers all three.
+  const pick = (m: ModuleId) => {
+    if (m === 'alloy-wheel') return wheelLab.setActive(true);
+    wheelLab.setActive(false);
+    ws.setComponent(m);
+  };
+  const moduleSwitch = <ModuleSwitch value={wheelLab.active ? 'alloy-wheel' : c} onChange={pick} />;
+  if (wheelLab.active) return <WheelDesignLab moduleSwitch={moduleSwitch} />;
+
   const est = estimatesFor(ws);
 
   return (
@@ -46,7 +62,7 @@ export function DesignLabPage() {
           </div>
         </div>
         <div className="page-actions">
-          <ComponentSwitch value={c} onChange={(v) => ws.setComponent(v)} />
+          {moduleSwitch}
           <button className="btn" onClick={() => navigate({ section: 'digital-twin', module: c })}>
             ◉ Open twin
           </button>
@@ -55,6 +71,8 @@ export function DesignLabPage() {
           </button>
         </div>
       </div>
+
+      <LabAB3D />
 
       <div className="lab-grid">
         <DesignPanel ws={ws} slot="A" />

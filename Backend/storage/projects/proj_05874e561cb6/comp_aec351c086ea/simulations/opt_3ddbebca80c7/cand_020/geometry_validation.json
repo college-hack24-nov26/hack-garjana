@@ -1,0 +1,41 @@
+{
+  "passed": true,
+  "metrics": {
+    "volume_m3": 4.118583262285326e-6,
+    "surface_area_m2": 0.003331972954357232,
+    "bounding_box_min_m": [
+      -0.007,
+      -0.007,
+      0.0
+    ],
+    "bounding_box_max_m": [
+      0.007,
+      0.007,
+      0.046
+    ],
+    "solid_count": 3,
+    "is_valid_solid": true,
+    "min_wall_thickness_m": 0.0013468261976333786,
+    "min_wall_thickness_basis": "parameter_derived"
+  },
+  "preserved_interface_checks": [
+    {
+      "name": "thread_outer_diameter",
+      "description": "Thread major diameter measured across the tessellated solid in the thread band",
+      "expected_value_m": 0.014,
+      "measured_value_m": 0.014000000000000002,
+      "tolerance_m": 0.0002,
+      "passed": true
+    },
+    {
+      "name": "overall_width",
+      "description": "Overall axial length measured across the tessellated solid",
+      "expected_value_m": 0.046,
+      "measured_value_m": 0.046,
+      "tolerance_m": 0.0003,
+      "passed": true
+    }
+  ],
+  "errors": [],
+  "warnings": []
+}

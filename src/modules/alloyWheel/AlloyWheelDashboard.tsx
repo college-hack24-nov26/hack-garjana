@@ -3,7 +3,9 @@ import type { ReactNode } from 'react';
 import { LineChart } from '../../ui/LineChart';
 import { Badge, Panel, fmt } from '../../ui/primitives';
 import { useStoreVersion } from '../../core/useStoreVersion';
-import { WheelSim } from './sim/wheelModel';
+import { WheelSim, isRig } from './sim/wheelModel';
+import './wheel.css';
+import { getWheelTwin } from './sharedTwin';
 import type { WheelPhase } from './sim/wheelModel';
 import { BuildClockContext, STRESS_GRADIENT, WheelSimContext, stressCss, useWheelSnapshot } from './sim/useWheelSim';
 import { spotLabel } from './sim/loads';
@@ -12,7 +14,9 @@ import { DRAWING } from './wheel/drawing';
 import { WheelScene, WHEEL_VIEWS } from './three/WheelScene';
 import type { WheelView } from './three/WheelScene';
 import { WheelParametersPanel } from './components/WheelParametersPanel';
-import { WheelTelemetryPanel, fmtLife, sci } from './components/WheelTelemetryPanel';
+import { WheelTelemetryPanel, fmtCycles, fmtLife, sci } from './components/WheelTelemetryPanel';
+import { ViewportInfo } from '../../ui/ViewportInfo';
+import { TwinWorkspace } from '../../ui/TwinWorkspace';
 
 const PHASE: Record<WheelPhase, { label: string; cls: string }> = {
   stopped: { label: 'Stopped', cls: 'stopped' },
@@ -22,6 +26,8 @@ const PHASE: Record<WheelPhase, { label: string; cls: string }> = {
   braking: { label: 'Braking', cls: 'braking' },
   'corner-outer': { label: 'Right turn · outer wheel', cls: 'cornering' },
   'corner-inner': { label: 'Left turn · inner wheel', cls: 'cornering' },
+  'rig-cornering': { label: 'Rig · rotating bending', cls: 'rig' },
+  'rig-radial': { label: 'Rig · radial drum', cls: 'rig' },
 };
 
 const TIME_AXIS = {
@@ -36,17 +42,6 @@ const fmtClock = (t: number) => {
   return `${String(m).padStart(2, '0')}:${s.toFixed(1).padStart(4, '0')}`;
 };
 
-/** One WheelSim and build clock for the whole session, so they survive switching modules. */
-let shared: { sim: WheelSim; clock: BuildClock } | null = null;
-function getShared() {
-  if (!shared) {
-    shared = { sim: new WheelSim(), clock: new BuildClock() };
-    shared.sim.play();
-    if (import.meta.env.DEV) (window as unknown as { __wheelSim: WheelSim }).__wheelSim = shared.sim;
-  }
-  return shared;
-}
-
 interface DashboardProps {
   moduleSwitch: ReactNode;
   onRunningChange?: (r: boolean) => void;
@@ -54,7 +49,7 @@ interface DashboardProps {
 
 /** Alloy Wheel page: the wheel from the reference drawing, rolling under a live load path. */
 export function AlloyWheelDashboard(props: DashboardProps) {
-  const [{ sim, clock }] = useState(getShared);
+  const [{ sim, clock }] = useState(getWheelTwin);
   return (
     <WheelSimContext.Provider value={sim}>
       <BuildClockContext.Provider value={clock}>
@@ -141,6 +136,9 @@ function Body({ moduleSwitch, onRunningChange, clock }: DashboardProps & { clock
   const markerIdx = Math.round((thetaDeg / 360) * (sim.cycle.length - 1));
   const marker = sim.cycle[markerIdx] ? { x: sim.cycle[markerIdx].deg, y: sim.cycle[markerIdx].crit } : null;
   const phase = PHASE[s.phase];
+  const rig = isRig(p.scenario) ? p.scenario : null;
+  const cycles = sim.cyclesToFailure;
+  const passes = cycles >= sim.rigTarget;
 
   return (
     <div className="page">
@@ -186,16 +184,29 @@ function Body({ moduleSwitch, onRunningChange, clock }: DashboardProps & { clock
             {fmt(sim.speedKmh, 1)} km/h · R<sub>e</sub> {fmt(s.effRadius * 1000, 0)} mm <Badge kind="model" />
           </div>
         </Panel>
-        <Panel bodyClass="kpi">
-          <div className="k-label">▼ Wheel load Fz</div>
-          <div className="k-value">
-            {fmt(s.Fz / 1000, 2)}
-            <small>kN</small>
-          </div>
-          <div className="k-sub">
-            Fy {fmt(s.Fy / 1000, 2)} · Fx {fmt(s.Fx / 1000, 2)} kN <Badge kind="model" />
-          </div>
-        </Panel>
+        {rig === 'rig-cornering' ? (
+          <Panel bodyClass="kpi">
+            <div className="k-label">↻ Test moment M</div>
+            <div className="k-value">
+              {fmt(sim.rigMoment / 1000, 2)}
+              <small>kN·m</small>
+            </div>
+            <div className="k-sub">
+              (μR + d)·Fv·S · Fv {fmt(p.staticLoadN / 1000, 2)} kN <Badge kind="derived" />
+            </div>
+          </Panel>
+        ) : (
+          <Panel bodyClass="kpi">
+            <div className="k-label">▼ {rig ? 'Drum load Fr' : 'Wheel load Fz'}</div>
+            <div className="k-value">
+              {fmt(s.Fz / 1000, 2)}
+              <small>kN</small>
+            </div>
+            <div className="k-sub">
+              {rig ? <>K·Fv = {fmt(p.rigK, 2)} × {fmt(p.staticLoadN / 1000, 2)} kN <Badge kind="derived" /></> : <>Fy {fmt(s.Fy / 1000, 2)} · Fx {fmt(s.Fx / 1000, 2)} kN <Badge kind="model" /></>}
+            </div>
+          </Panel>
+        )}
         <Panel bodyClass="kpi">
           <div className="k-label">
             <span style={{ color: stressCss(s.peakMPa / limit) }}>●</span> Peak spoke stress
@@ -208,19 +219,32 @@ function Body({ moduleSwitch, onRunningChange, clock }: DashboardProps & { clock
             {spotLabel(s.peakSpot).toLowerCase()} · FoS {Number.isFinite(fos) ? fmt(fos, 1) : '—'} on yield <Badge kind="estimated" />
           </div>
         </Panel>
-        <Panel bodyClass="kpi">
-          <div className="k-label">∿ Life at this condition</div>
-          <div className="k-value">
-            {fmtLife(sim.lifeKm)}
-            <small>km</small>
-          </div>
-          <div className="k-sub">
-            ±{fmt(s.eqAmpMPa, 0)} MPa/turn · damage {sci(s.damage)} <Badge kind="estimated" />
-          </div>
-        </Panel>
+        {rig ? (
+          <Panel bodyClass="kpi">
+            <div className="k-label">∿ Cycles to failure</div>
+            <div className="k-value">
+              {fmtCycles(cycles)}
+              <span className={`rig-verdict ${passes ? 'pass' : 'fail'}`}>{passes ? 'meets target' : 'below target'}</span>
+            </div>
+            <div className="k-sub">
+              target {fmtCycles(sim.rigTarget)} · ±{fmt(s.eqAmpMPa, 0)} MPa at {spotLabel(s.critSpot).toLowerCase()} <Badge kind="estimated" />
+            </div>
+          </Panel>
+        ) : (
+          <Panel bodyClass="kpi">
+            <div className="k-label">∿ Life at this condition</div>
+            <div className="k-value">
+              {fmtLife(sim.lifeKm)}
+              <small>km</small>
+            </div>
+            <div className="k-sub">
+              ±{fmt(s.eqAmpMPa, 0)} MPa/turn · damage {sci(s.damage)} <Badge kind="estimated" />
+            </div>
+          </Panel>
+        )}
       </div>
 
-      <div className="workspace">
+      <TwinWorkspace>
         <WheelParametersPanel />
 
         <div className="viewport">
@@ -234,10 +258,17 @@ function Body({ moduleSwitch, onRunningChange, clock }: DashboardProps & { clock
             exploded={exploded}
             showTyre={showTyre}
             showLoads={showLoads && !clock.active && !exploded}
+            rig={rig}
           />
           {!clock.active && (
-          <div className="vp-info">
-            <div className="t">Front-left wheel on the road: fixed axle, rotating wheel and tyre</div>
+          <ViewportInfo>
+            <div className="t">
+              {rig === 'rig-cornering'
+                ? 'Cornering-fatigue rig: no tyre, constant moment through the hub'
+                : rig === 'rig-radial'
+                  ? 'Radial-fatigue rig: tyred wheel loaded onto a rotating drum'
+                  : 'Front-left wheel on the road: fixed axle, rotating wheel and tyre'}
+            </div>
             <div className="d">
               {p.spokeCount} Y-spokes · fork R{fmt(p.forkRadiusMm)} · legs {fmt(p.legSpreadMm)} apart · 5× Ø10 on a 72° pitch ·
               ET +58
@@ -245,7 +276,7 @@ function Body({ moduleSwitch, onRunningChange, clock }: DashboardProps & { clock
               Arrows = tyre forces at the contact patch (30 mm per kN)
             </div>
             <div className="w">Geometry from the drawing · stresses are a beam estimate, not FEA</div>
-          </div>
+          </ViewportInfo>
           )}
           <div className="vp-readout">
             <div className="r">
@@ -300,7 +331,7 @@ function Body({ moduleSwitch, onRunningChange, clock }: DashboardProps & { clock
         </div>
 
         <WheelTelemetryPanel />
-      </div>
+      </TwinWorkspace>
 
       <div className="charts">
         <LineChart

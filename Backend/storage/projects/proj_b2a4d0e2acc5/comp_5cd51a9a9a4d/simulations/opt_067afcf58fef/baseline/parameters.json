@@ -1,0 +1,21 @@
+{
+  "parameters": {
+    "rim_diameter_m": 0.4318,
+    "rim_width_m": 0.1905,
+    "center_bore_diameter_m": 0.0666,
+    "bolt_count": 5.0,
+    "bolt_circle_diameter_m": 0.112,
+    "bolt_hole_diameter_m": 0.014,
+    "hub_pad_diameter_m": 0.16,
+    "spoke_count": 7.0,
+    "spoke_root_width_m": 0.044,
+    "spoke_tip_width_m": 0.03,
+    "spoke_thickness_m": 0.016,
+    "spoke_dish_offset_m": 0.085,
+    "hub_thickness_m": 0.02,
+    "rim_wall_thickness_m": 0.008
+  },
+  "generator": "alloy_wheel_parametric",
+  "generator_version": "1.0.0",
+  "geometry_hash": "e91fb6b1d4f22d940e21a9391f497cc2"
+}

@@ -1,0 +1,289 @@
+/* =====================================================================
+ * AutoTwin Precision Engineering Studio: design system layer.
+ *
+ * Loaded LAST (see main.tsx), after styles.css and pages.css. It does two
+ * things:
+ *   1. Defines the canonical studio tokens (--studio-bg, --surface-1, ...),
+ *      then points the legacy token names that every page already uses
+ *      (--bg, --surface, --text, --accent, ...) at the new values. Legacy
+ *      names are KEPT on purpose: page CSS owned by other work streams, the
+ *      printable Reports sheet (which overrides --text/--surface locally)
+ *      and solver.css all read them.
+ *   2. Refines the shared component classes (.panel, .btn, .badge, .tabs,
+ *      .seg, inputs, viewport overlays) without renaming any of them.
+ *
+ * Rule of thumb for materials (see DESIGN_SYSTEM.md):
+ *   solid surfaces for engineering content (forms, telemetry, tables,
+ *   warnings); glass ONLY for small controls floating over the 3D scene.
+ * ===================================================================== */
+
+:root {
+  /* ---- Canonical studio palette: Obsidian / Anodized Titanium / Ice Cyan / Signal Amber ---- */
+  --studio-bg: #080c13;
+  --studio-nav: #0b1420;
+  --surface-1: #111b28;
+  --surface-2-solid: #172334;
+  --surface-raised: #1d2b3f;
+  --surface-hover: #22344d;
+  --text-primary: #f2f6fc;
+  --text-secondary: #aab8c9;
+  --text-muted: #8495aa;
+  --accent-cyan: #54d4ec;
+  --accent-ice: #8dc9f0;
+  --status-success: #50c99b;
+  --status-warning: #f1b85d;
+  --status-danger: #f07683;
+  --status-ai: #a995fa;
+  --status-model: #a995fa;
+  --status-theoretical: #c4b5fd;
+  --hairline: rgba(218, 232, 250, 0.09);
+  --hairline-strong: rgba(218, 232, 250, 0.16);
+
+  /* ---- Materials ---- */
+  --glass-bg: rgba(14, 22, 34, 0.6);
+  --glass-bg-solid: rgba(14, 22, 34, 0.95);
+  --glass-border: rgba(218, 232, 250, 0.14);
+  --glass-blur: blur(14px) saturate(140%);
+  --shadow-float: 0 10px 28px -14px rgba(0, 0, 0, 0.75);
+  --shadow-raised: 0 1px 0 rgba(255, 255, 255, 0.03) inset, 0 12px 32px -24px rgba(0, 0, 0, 0.9);
+
+  /* ---- Shape + spacing (4px grid) ---- */
+  --radius-sm: 6px;
+  --radius: 10px;
+  --radius-lg: 14px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --focus-ring: 0 0 0 2px var(--studio-bg), 0 0 0 4px var(--accent-cyan);
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  /* ---- Legacy names -> studio values (do not remove; see header) ---- */
+  --bg: var(--studio-bg);
+  --bg-2: var(--studio-nav);
+  --surface: var(--surface-1);
+  --surface-2: var(--surface-2-solid);
+  --surface-3: var(--surface-hover);
+  --border: var(--hairline);
+  --border-strong: var(--hairline-strong);
+  --text: var(--text-primary);
+  --text-2: var(--text-secondary);
+  --muted: var(--text-muted);
+  --accent: var(--accent-cyan);
+  --accent-2: var(--accent-ice);
+  --accent-soft: rgba(84, 212, 236, 0.12);
+  --amber: var(--status-warning);
+  --amber-soft: rgba(241, 184, 93, 0.12);
+  --violet: var(--status-ai);
+  --violet-soft: rgba(169, 149, 250, 0.14);
+  --green: var(--status-success);
+  --green-soft: rgba(80, 201, 155, 0.12);
+  --red: var(--status-danger);
+  --red-soft: rgba(240, 118, 131, 0.14);
+  --font: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --mono: 'JetBrains Mono', 'IBM Plex Mono', ui-monospace, 'Cascadia Mono', Consolas, monospace;
+}
+
+body {
+  background: var(--studio-bg);
+  font-size: 14px;
+  font-feature-settings: 'cv11', 'ss01';
+  text-rendering: optimizeLegibility;
+}
+/* Engineering numbers line up in columns. */
+.k-value, .tele-row .v, .num, .data-table td.r, .ab-row .v, .vp-readout .r, .chart-now, .anim-clock .val,
+.dim-table td.v, .cyl-table td { font-variant-numeric: tabular-nums; }
+
+::selection { background: rgba(84, 212, 236, 0.28); }
+::-webkit-scrollbar-thumb { background: #1d2a3c; border-color: var(--studio-bg); }
+
+/* ---------------- Page frame ---------------- */
+.page { padding: 22px 28px 36px; gap: 18px; max-width: 1760px; }
+.page-head h1 { font-size: 28px; letter-spacing: -0.02em; font-weight: 700; }
+.page-sub { font-size: 12px; color: var(--text-secondary); margin-top: 8px; line-height: 1.5; }
+
+/* ---------------- Surfaces (solid, for engineering content) ---------------- */
+.panel {
+  background: var(--surface-1);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-raised);
+}
+.panel-head { padding: 14px 16px 0; }
+.panel-title {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--text-primary);
+}
+.panel-body { padding: 12px 16px 16px; }
+.section-label, .sub-title, .chart-title {
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+}
+
+/* KPI tiles */
+.kpis { gap: 14px; }
+.kpi { padding: 14px 16px; }
+.kpi .k-label { font-size: 11px; color: var(--text-secondary); letter-spacing: 0.08em; }
+.kpi .k-value { font-size: 26px; font-weight: 600; margin-top: 8px; letter-spacing: -0.01em; }
+.kpi .k-value small { font-size: 12.5px; color: var(--text-muted); }
+.kpi .k-sub { font-size: 11.5px; color: var(--text-muted); margin-top: 6px; }
+
+/* ---------------- Buttons ---------------- */
+.btn {
+  min-height: 32px;
+  padding: 6px 13px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  border: 1px solid var(--hairline-strong);
+  background: var(--surface-2-solid);
+  transition: background 0.15s var(--ease-out), border-color 0.15s var(--ease-out), transform 0.08s;
+}
+.btn:hover { background: var(--surface-hover); border-color: rgba(218, 232, 250, 0.24); }
+.btn:active { transform: translateY(1px); }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+.btn.primary { background: var(--accent-cyan); border-color: var(--accent-cyan); color: #04151c; }
+.btn.primary:hover { background: #7fe1f2; border-color: #7fe1f2; }
+.btn.warn { background: var(--status-warning); border-color: var(--status-warning); color: #241600; }
+.btn.danger { background: var(--red-soft); border-color: rgba(240, 118, 131, 0.55); color: #ffd3d8; }
+.btn.sm { min-height: 28px; padding: 3px 10px; font-size: 12px; border-radius: 7px; }
+.btn:focus-visible, .seg button:focus-visible, .tabs button:focus-visible, .vp-btn:focus-visible,
+.switch:focus-visible, .num:focus-visible, .select:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+/* Segmented controls + tabs */
+.seg, .tabs {
+  background: var(--studio-bg);
+  border: 1px solid var(--hairline);
+  border-radius: 9px;
+  padding: 3px;
+}
+.seg button, .tabs button { border-radius: 6px; font-size: 12.5px; padding: 5px 11px; transition: background 0.15s, color 0.15s; }
+.seg button:hover:not(.active):not(:disabled), .tabs button:hover:not(.active) { color: var(--text-primary); }
+.seg button.active, .tabs button.active {
+  background: var(--surface-raised);
+  color: var(--text-primary);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.05) inset, 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+.tabs button.active { color: var(--accent-cyan); }
+
+/* ---------------- Inputs ---------------- */
+.num, .select, .text {
+  background: var(--studio-bg);
+  border: 1px solid var(--hairline-strong);
+  border-radius: 7px;
+  min-height: 30px;
+  transition: border-color 0.15s;
+}
+.num:hover, .select:hover, .text:hover { border-color: rgba(218, 232, 250, 0.26); }
+.num:focus, .select:focus, .text:focus { border-color: var(--accent-cyan); }
+.field { border-bottom-color: var(--hairline); padding: 12px 0; }
+.field-label { font-size: 13px; }
+.field-label small { font-size: 11.5px; color: var(--text-muted); }
+.unit { color: var(--text-muted); }
+.hint { font-size: 11.5px; color: var(--text-muted); }
+input[type='range']::-webkit-slider-runnable-track {
+  background: linear-gradient(90deg, var(--accent-cyan) var(--fill, 0%), #223247 var(--fill, 0%));
+}
+input[type='range']::-webkit-slider-thumb {
+  width: 16px; height: 16px; margin-top: -6px; background: #f2f6fc;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.4), 0 2px 6px rgba(0, 0, 0, 0.5);
+}
+input[type='range']:focus-visible { outline: none; }
+input[type='range']:focus-visible::-webkit-slider-thumb { box-shadow: var(--focus-ring); }
+input[type='range']::-moz-range-progress { background: var(--accent-cyan); }
+input[type='range']::-moz-range-thumb { width: 16px; height: 16px; background: #f2f6fc; }
+.switch { background: #26364c; }
+.switch.on { background: var(--accent-cyan); }
+
+/* Notes and warnings stay solid and prominent. */
+.note { border-radius: 9px; font-size: 12.5px; color: #d3e6f4; background: rgba(141, 201, 240, 0.07); }
+.note.amber { color: #f5e6c4; background: rgba(241, 184, 93, 0.08); }
+
+/* ---------------- Provenance badges ----------------
+ * Text label + colour, never colour alone (WCAG 1.4.1). Same kinds as before. */
+.badge { border-radius: 5px; font-size: 9.5px; padding: 2px 6px; }
+.badge.input { color: var(--accent-cyan); border-color: rgba(84, 212, 236, 0.42); background: rgba(84, 212, 236, 0.1); }
+.badge.derived { color: var(--status-success); border-color: rgba(80, 201, 155, 0.4); background: rgba(80, 201, 155, 0.1); }
+.badge.model { color: var(--status-model); border-color: rgba(169, 149, 250, 0.45); background: rgba(169, 149, 250, 0.12); }
+.badge.estimated { color: var(--status-warning); border-color: rgba(241, 184, 93, 0.45); background: rgba(241, 184, 93, 0.1); }
+
+/* ---------------- Tables ---------------- */
+.data-table td, .cyl-table td, .dim-table td, .ab-row { border-top-color: var(--hairline); }
+.tele-row { font-size: 13px; padding: 7px 0; }
+
+/* =====================================================================
+ * 3D viewport: the stage. Neutral studio backdrop; floating controls use
+ * the glass material, which is the ONLY place glass is used in content.
+ * ===================================================================== */
+.viewport {
+  height: clamp(500px, 66vh, 820px);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--hairline);
+  background:
+    radial-gradient(90% 70% at 50% 38%, #1b2636 0%, #0e151f 55%, #080b11 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+/* Glass material for small floating controls over the scene. */
+.vp-btn, .vp-readout .r, .vp-legend, .vp-paused, details.vp-info-drop > summary, .glass {
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-float), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .vp-btn, .vp-readout .r, .vp-legend, .vp-paused, details.vp-info-drop > summary, .glass { background: var(--glass-bg-solid); }
+}
+.vp-btn {
+  min-height: 28px;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  color: var(--text-primary);
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.vp-btn:hover { border-color: rgba(218, 232, 250, 0.3); background: rgba(30, 44, 64, 0.72); }
+.vp-btn.active { background: rgba(84, 212, 236, 0.9); color: #04151c; border-color: rgba(84, 212, 236, 0.9); }
+.vp-btn.fire.active { background: #f08a3c; border-color: #f08a3c; color: #1c0a00; }
+.vp-bottom { left: 12px; right: 12px; bottom: 12px; }
+.vp-readout { top: 12px; right: 12px; }
+.vp-readout .r { border-radius: 8px; padding: 6px 11px; }
+.vp-legend { border-radius: 8px; bottom: 54px; left: 12px; }
+.vp-paused { border-radius: 8px; color: var(--text-secondary); }
+details.vp-info-drop { top: 12px; left: 12px; }
+/* The long description panel is reading content: solid, not glass. */
+details.vp-info-drop .vp-info-body { background: rgba(12, 18, 28, 0.96); backdrop-filter: none; border-radius: 10px; }
+
+/* Spark plug cylinder chips: a column under "Model info" instead of a row the
+ * view toolbar can cover when it wraps in a narrow stage. */
+.cyl-row { top: 52px; bottom: auto; left: 12px; right: auto; flex-direction: column; gap: 5px; }
+.cyl-chip {
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  border-color: var(--glass-border);
+  border-radius: 8px;
+}
+.cyl-chip.firing { border-color: rgba(241, 184, 93, 0.85); }
+
+/* State chips: label + dot + colour. */
+.state-chip { border-radius: 7px; }
+
+/* ---------------- Charts ---------------- */
+.charts { gap: 14px; }
+.chart { padding: 14px 14px 10px; }
+
+/* ---------------- Motion preferences ---------------- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+}

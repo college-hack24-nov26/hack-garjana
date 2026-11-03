@@ -7,7 +7,7 @@ import { getDesign, validateCandidate, withPatch } from '../designAccess';
 import type { FocusRequest } from '../focus/focusSpec';
 import type { InsightContext } from '../types';
 import { localReply } from './engine';
-import { activeChatProvider, chatStore, localChat } from './instance';
+import { activeChatProvider, chatStore, localChat, providerState, refreshChatProvider } from './instance';
 import { describePatch } from './optimizer';
 import type { Patch } from './optimizer';
 import { replyWithGuardrails } from './provider';
@@ -27,8 +27,27 @@ export interface ChatHandlers {
  * Answers come from the active chat provider (the local rule-based one here)
  * and pass the same guardrails as every explanation on the page.
  */
+/** Which provider is answering: Groq (via the backend) or the local rules. */
+export function ChatProviderChip() {
+  useStoreVersion(providerState);
+  const p = activeChatProvider();
+  return (
+    <span className="chip" title={p.deterministic ? 'Rule-based answers, offline' : 'Worded by a Groq model through the AutoTwin backend; numbers and verdicts still come from the rules'}>
+      {p.label}
+    </span>
+  );
+}
+
 export function ChatPanel({ ctx, src, handlers }: { ctx: InsightContext; src: InsightSource; handlers: ChatHandlers }) {
   useStoreVersion(chatStore);
+  useStoreVersion(providerState);
+
+  // Pick up a Groq key added to the backend without reloading the page.
+  useEffect(() => {
+    void refreshChatProvider();
+    const id = setInterval(() => void refreshChatProvider(), 30_000);
+    return () => clearInterval(id);
+  }, []);
   const c = ctx.component;
   const msgs = chatStore.messages[c];
   const plan = chatStore.plans[c];
@@ -59,7 +78,12 @@ export function ChatPanel({ ctx, src, handlers }: { ctx: InsightContext; src: In
     try {
       const history = chatStore.messages[c].slice(-9, -1).map((m) => ({ role: m.role, text: m.text }));
       const g = await replyWithGuardrails(activeChatProvider(), { question, ctx, history, plan: chatStore.plans[c] }, localChat);
-      chatStore.add({ role: 'assistant', component: c, source: g.providerId, ...g.reply });
+      const note = g.fellBack
+        ? `
+
+(${g.providerId === 'groq' ? 'Groq' : g.providerId} answer not used: ${g.violations[0] ?? 'unavailable'}. Showing the local answer.)`
+        : '';
+      chatStore.add({ role: 'assistant', component: c, source: g.fellBack ? localChat.id : g.providerId, ...g.reply, text: g.reply.text + note });
     } catch {
       chatStore.add({ role: 'assistant', component: c, source: localChat.id, text: 'Something went wrong answering that. Please try again.' });
     } finally {
@@ -230,7 +254,7 @@ function Message({ msg, onAct }: { msg: ChatMessage; onAct: (a: ChatAction) => v
         </div>
       )}
       <div className="msg-meta">
-        {msg.role === 'user' ? 'You' : msg.source === 'local-rules' ? 'AutoTwin · local rules' : `AutoTwin · ${msg.source}`} · {fmtDateTime(msg.t)}
+        {msg.role === 'user' ? 'You' : msg.source === 'local-rules' ? 'AutoTwin · local rules' : msg.source === 'groq' ? 'AutoTwin · Groq (numbers from the rules)' : `AutoTwin · ${msg.source}`} · {fmtDateTime(msg.t)}
       </div>
     </div>
   );

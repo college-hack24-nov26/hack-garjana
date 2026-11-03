@@ -1,0 +1,136 @@
+{
+  "result_kind": "linear_static",
+  "analysis_type": "linear_static_structural",
+  "solver_name": "scikit-fem linear elasticity (quadratic tetrahedra)",
+  "solver_version": "skfem-12.0.2",
+  "solve_time_seconds": 44.541421199999604,
+  "degrees_of_freedom": 148707,
+  "summary": {
+    "mass_kg": 5.737842892171885,
+    "volume_m3": 0.002136999214961596,
+    "max_von_mises_pa": 220743710.43016097,
+    "max_displacement_m": 0.003202090838503474,
+    "compliance_j": 2.7182902331071803,
+    "min_factor_of_safety": 0.928678781381896,
+    "factor_of_safety_basis": "yield strength 205 MPa divided by the peak nodal-projected von Mises stress",
+    "max_temperature_k": null,
+    "min_temperature_k": null,
+    "max_temperature_gradient_k_per_m": null,
+    "heat_flow_w": null,
+    "min_wall_thickness_m": 0.005595494293807821
+  },
+  "mesh_metadata": {
+    "node_count": 8385,
+    "tet_count": 24416,
+    "boundary_triangle_count": 16744,
+    "target_element_size_m": 0.0112,
+    "min_element_size_m": 0.00504,
+    "fe_element_order": 2,
+    "gmsh_version": "4.15.2",
+    "quality": {
+      "min_quality": 0.08572550525256731,
+      "mean_quality": 0.8066065194371761,
+      "quality_measure": "gamma (inscribed/circumscribed radius ratio)",
+      "poor_element_count": 27,
+      "poor_element_threshold": 0.1
+    },
+    "subdomain_element_counts": {},
+    "warnings": [
+      "27 tetrahedra have quality below 0.1 (minimum 0.086); stress near those elements is less reliable"
+    ]
+  },
+  "region_applications": [
+    {
+      "region": "bolt_hole_bearing_surfaces",
+      "role": "support:fixed",
+      "facet_count": 222,
+      "area_m2": 0.00290756676915644,
+      "note": "Barrels of the wheel bolt holes. Fixing these represents the clamped bolted joint to the hub flange in a simplified way; it is not a modelled bolt pretension or contact analysis."
+    },
+    {
+      "region": "hub_mounting_face",
+      "role": "support:fixed",
+      "facet_count": 614,
+      "area_m2": 0.015969753896379404,
+      "note": "Annular mounting-pad face at z = 0 that seats against the hub flange. Used together with the bolt holes as the simplified support."
+    },
+    {
+      "region": "rim_contact_patch",
+      "role": "load:force",
+      "facet_count": 675,
+      "area_m2": 0.03565443124371459,
+      "note": "4500.0 N resultant spread as uniform traction over 356.5 cm2"
+    }
+  ],
+  "load_verifications": [
+    {
+      "region": "rim_contact_patch",
+      "load_type": "force",
+      "requested_magnitude_n": 4500.0,
+      "requested_vector_n": [
+        0.0,
+        -4500.0,
+        0.0
+      ],
+      "applied_magnitude_n": 4500.0,
+      "applied_vector_n": [
+        0.0,
+        -4500.0,
+        0.0
+      ],
+      "relative_error": 0.0,
+      "tolerance": 0.02,
+      "passed": true,
+      "reference_basis": "requested resultant force, spread as uniform traction over the region area",
+      "note": "4500.0 N resultant spread as uniform traction over 356.5 cm2"
+    }
+  ],
+  "field_artifact": {
+    "path": "C:\\Users\\Sarthak\\Desktop\\phaltan\\storage\\projects\\proj_b4fc23f9de85\\comp_6b562ba30f67\\simulations\\opt_2688b603fab1\\cand_006\\result_fields_radial_road_load.npz",
+    "format": "npz",
+    "node_count": 8350,
+    "triangle_count": 16744,
+    "has_displacement": true,
+    "has_stress": true,
+    "has_temperature": false,
+    "stress_location": "nodal_l2_projected",
+    "temperature_location": null,
+    "note": "Boundary surface of the analysis mesh with nodal displacement vectors and L2-projected nodal von Mises stress, in metres and pascals."
+  },
+  "material_snapshot": {
+    "primary": {
+      "material_id": "al_a356_t6",
+      "name": "A356-T6 cast aluminium alloy",
+      "family": "aluminium_casting_alloy",
+      "typical_use": "Cast alloy road wheel",
+      "density": 2685.0,
+      "elastic_modulus": 72400000000.0,
+      "poisson_ratio": 0.33,
+      "yield_strength": 205000000.0,
+      "ultimate_tensile_strength": 262000000.0,
+      "thermal_conductivity": 151.0,
+      "specific_heat": 963.0,
+      "max_service_temperature": 423.15,
+      "source_status": "illustrative_handbook_value",
+      "source_document": null,
+      "notes": null,
+      "temperature_dependent_properties": null,
+      "record_version": "1.0.0",
+      "last_reviewed": "2026-11-02"
+    }
+  },
+  "linear_solver_report": {
+    "method": "algebraic multigrid preconditioned conjugate gradient (pyamg)",
+    "unknowns": 143382,
+    "relative_residual": 6.582249528018415e-9,
+    "iterations": 31,
+    "wall_seconds": 18.1946672999984,
+    "fell_back": false,
+    "note": "Converged to a relative residual of 6.58e-09 in 31 iterations."
+  },
+  "load_case_id": "radial_road_load",
+  "warnings": [
+    "27 tetrahedra have quality below 0.1 (minimum 0.086); stress near those elements is less reliable"
+  ],
+  "method_statement": "3D linear-elastic small-displacement finite-element analysis with 10-node tetrahedra, verified against the analytical cantilever-beam benchmark. It does not model fatigue, impact, contact, bolt pretension, plasticity or casting defects, and it is not a certification of road-worthiness."
+}

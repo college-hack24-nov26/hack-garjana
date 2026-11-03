@@ -1,7 +1,7 @@
 import { Badge, Panel, fmt } from '../../../ui/primitives';
 import type { BadgeKind } from '../../../ui/primitives';
 import { useWheelSnapshot } from '../sim/useWheelSim';
-import { LOAD_TRANSFER, MODEL } from '../sim/wheelModel';
+import { LOAD_TRANSFER, MODEL, isRig } from '../sim/wheelModel';
 import { SPOTS, spotLabel } from '../sim/loads';
 
 function Row({ l, v, u, b }: { l: string; v: string; u?: string; b: BadgeKind }) {
@@ -20,7 +20,16 @@ function Row({ l, v, u, b }: { l: string; v: string; u?: string; b: BadgeKind })
 /** 1.2e-5 style for tiny numbers, plain otherwise. */
 export const sci = (v: number, d = 1) => (v === 0 ? '0' : Math.abs(v) < 1e-3 || Math.abs(v) >= 1e6 ? v.toExponential(d) : fmt(v, 4));
 
-export const fmtLife = (km: number) => (!Number.isFinite(km) || km > 1e7 ? '> 10⁷' : km >= 1e4 ? km.toExponential(1) : fmt(km, km < 10 ? 1 : 0));
+/** 4.6, 520, 5.2×10⁵ … for cycle counts. */
+export function fmtCycles(n: number) {
+  if (!Number.isFinite(n) || n > 1e12) return '> 10¹²';
+  if (n < 1000) return fmt(n, n < 10 ? 1 : 0);
+  const e = Math.floor(Math.log10(n));
+  const sup = String(e).replace(/./g, (d) => '⁰¹²³⁴⁵⁶⁷⁸⁹'[+d]);
+  return `${(n / 10 ** e).toFixed(1)}×10${sup}`;
+}
+
+export const fmtLife =(km: number) => (!Number.isFinite(km) || km > 1e7 ? '> 10⁷' : km >= 1e4 ? km.toExponential(1) : fmt(km, km < 10 ? 1 : 0));
 
 export function WheelTelemetryPanel() {
   const sim = useWheelSnapshot();
@@ -29,11 +38,13 @@ export function WheelTelemetryPanel() {
   const mass = sim.mass;
   const limit = sim.fatigueLimitMPa;
   const fos = s.peakMPa > 0 ? sim.material.yieldMPa / s.peakMPa : Infinity;
+  const rig = isRig(p.scenario) ? p.scenario : null;
+  const meets = sim.cyclesToFailure >= sim.rigTarget;
   const bottomShare = s.arms.length ? Math.max(...s.arms.map((a) => a.n)) / Math.max(1, s.Fz) : 0;
 
   return (
     <Panel className="telemetry" title="Live telemetry" right={<Badge kind="model" label="Reduced-order" />}>
-      <Row l="Vehicle speed" v={fmt(sim.speedKmh, 1)} u="km/h" b="model" />
+      <Row l={rig ? 'Rig speed (equivalent)' : 'Vehicle speed'} v={fmt(sim.speedKmh, 1)} u="km/h" b={rig ? 'input' : 'model'} />
       <Row l="Wheel speed" v={fmt(sim.rpm, 0)} u="rpm" b="derived" />
       <Row l="Vertical load Fz" v={fmt(s.Fz / 1000, 2)} u="kN" b="model" />
       <Row l="Lateral force Fy" v={fmt(s.Fy / 1000, 2)} u="kN" b="model" />
@@ -54,7 +65,14 @@ export function WheelTelemetryPanel() {
       <Row l="Distance" v={fmt(s.distanceM, 0)} u="m" b="derived" />
       <Row l="Stress amplitude (Goodman)" v={fmt(s.eqAmpMPa, 1)} u="MPa" b="estimated" />
       <Row l="Fatigue damage used" v={sci(s.damage)} b="estimated" />
-      <Row l="Life at this condition" v={fmtLife(sim.lifeKm)} u="km" b="estimated" />
+      {rig ? (
+        <>
+          <Row l="Cycles to failure" v={fmtCycles(sim.cyclesToFailure)} b="estimated" />
+          <Row l="Target cycles" v={fmtCycles(sim.rigTarget)} b="input" />
+        </>
+      ) : (
+        <Row l="Life at this condition" v={fmtLife(sim.lifeKm)} u="km" b="estimated" />
+      )}
 
       <div className="sub-title">Wheel (from the drawn geometry)</div>
       <Row l="Mass" v={fmt(mass.massKg, 2)} u="kg" b="derived" />
@@ -68,8 +86,36 @@ export function WheelTelemetryPanel() {
           loads stop rising too.
         </p>
       )}
+      {rig === 'rig-cornering' && (
+        <p className="insight">
+          The rig moment <b>{fmt(sim.rigMoment, 0)} N·m</b> bends every spoke out of the wheel plane; the spokes passing
+          top and bottom carry it, the ones at 3 and 9 o&apos;clock don&apos;t. There is no radial load, so the cycle is
+          fully reversed (mean ≈ 0).
+        </p>
+      )}
+      {rig === 'rig-radial' && (
+        <p className="insight">
+          The drum pushes <b>{fmt(s.Fz / 1000, 2)} kN</b> into the tyre, K = {fmt(p.rigK, 2)} times the rated load. The
+          spokes passing the drum are squeezed, and the {fmt(sim.layout.dOffset * 1000, 0)} mm offset from the tyre centre
+          plane to the spoke roots also bends them out of plane.
+        </p>
+      )}
+      {rig && (
+        <p className={meets ? 'insight' : 'insight warn-line'}>
+          Estimated <b>{fmtCycles(sim.cyclesToFailure)}</b> cycles to failure against a target of{' '}
+          <b>{fmtCycles(sim.rigTarget)}</b>
+          {meets
+            ? `: the design meets the target in this model, with ${fmt(sim.cyclesToFailure / sim.rigTarget, 1)}× margin on life.`
+            : ': below target. Widen the legs, deepen the spokes or lower the stress concentration, then compare.'}
+        </p>
+      )}
       <p className="insight">
-        The spoke over the contact patch carries <b>{fmt(bottomShare * 100, 0)} %</b> of Fz. Each spoke goes through one
+        {!rig && (
+          <>
+            The spoke over the contact patch carries <b>{fmt(bottomShare * 100, 0)} %</b> of Fz.{' '}
+          </>
+        )}
+        Each spoke goes through one
         full stress cycle per turn. The critical point is the <b>{spotLabel(s.critSpot).toLowerCase()}</b>, swinging ±
         <b>{fmt(s.ampMPa, 1)} MPa</b> about <b>{fmt(s.meanMPa, 1)} MPa</b>.
       </p>

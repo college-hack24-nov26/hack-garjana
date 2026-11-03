@@ -1,0 +1,49 @@
+{
+  "passed": true,
+  "metrics": {
+    "volume_m3": 0.0035018095106864426,
+    "surface_area_m2": 0.7611440704323323,
+    "bounding_box_min_m": [
+      -0.2159,
+      -0.2159,
+      -4.8999999999999065e-6
+    ],
+    "bounding_box_max_m": [
+      0.2159,
+      0.2159,
+      0.1905001
+    ],
+    "solid_count": 1,
+    "is_valid_solid": true,
+    "min_wall_thickness_m": 0.007674014588882264,
+    "min_wall_thickness_basis": "parameter_derived"
+  },
+  "preserved_interface_checks": [
+    {
+      "name": "rim_outer_diameter",
+      "description": "Rim outer (bead-seat) diameter measured across the tessellated solid",
+      "expected_value_m": 0.4318,
+      "measured_value_m": 0.4318000000000001,
+      "tolerance_m": 0.001,
+      "passed": true
+    },
+    {
+      "name": "rim_width",
+      "description": "Overall axial width measured across the tessellated solid",
+      "expected_value_m": 0.1905,
+      "measured_value_m": 0.1905,
+      "tolerance_m": 0.001,
+      "passed": true
+    },
+    {
+      "name": "center_bore_diameter",
+      "description": "Centre-bore diameter measured as the minimum material radius in the hub band",
+      "expected_value_m": 0.0666,
+      "measured_value_m": 0.06659999999999999,
+      "tolerance_m": 0.001,
+      "passed": true
+    }
+  ],
+  "errors": [],
+  "warnings": []
+}

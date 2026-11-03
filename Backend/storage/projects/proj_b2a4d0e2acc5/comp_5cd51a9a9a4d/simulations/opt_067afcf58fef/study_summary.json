@@ -1,0 +1,454 @@
+{
+  "optimization_run_id": "opt_067afcf58fef",
+  "algorithm": "seeded Latin-hypercube design of experiments",
+  "random_seed": 20261102,
+  "termination_reason": "candidate budget of 7 exhausted",
+  "summary": {
+    "candidates_generated": 8,
+    "candidates_evaluated": 8,
+    "candidates_feasible": 6,
+    "candidates_failed": 0,
+    "cache_hits": 0,
+    "total_seconds": 867.6823540000005,
+    "mean_solve_seconds": 96.05554943749985,
+    "max_solve_seconds": 455.1853409999967
+  },
+  "recommendation": {
+    "candidate_id": "cand_00d760d2889f",
+    "improves_on_baseline": false,
+    "primary_metric": "mass_kg",
+    "baseline_value": 7.7328443094243955,
+    "candidate_value": 8.991272112581093,
+    "percent_change": 16.273802404413992,
+    "statement": "Candidate 5 is the best feasible generated design, but it does not beat the baseline on mass (7.733 kg to 8.991 kg). Every candidate that reached a lower value violated a constraint. The baseline remains the best feasible design in the space searched so far."
+  },
+  "comparison": {
+    "mass_kg": {
+      "available": true,
+      "baseline": {
+        "value": 7.7328443094243955,
+        "unit": "kg",
+        "canonical_value": 7.7328443094243955,
+        "canonical_unit": "kg"
+      },
+      "candidate": {
+        "value": 8.991272112581093,
+        "unit": "kg",
+        "canonical_value": 8.991272112581093,
+        "canonical_unit": "kg"
+      },
+      "absolute_change": 1.2584278031566978,
+      "percent_change": 16.273802404413992
+    },
+    "max_von_mises_pa": {
+      "available": true,
+      "baseline": {
+        "value": 59.44920443783615,
+        "unit": "MPa",
+        "canonical_value": 59449204.43783615,
+        "canonical_unit": "Pa"
+      },
+      "candidate": {
+        "value": 84.06617303042268,
+        "unit": "MPa",
+        "canonical_value": 84066173.03042267,
+        "canonical_unit": "Pa"
+      },
+      "absolute_change": 24616968.592586525,
+      "percent_change": 41.40840710211284
+    },
+    "max_displacement_m": {
+      "available": true,
+      "baseline": {
+        "value": 0.9167243808034075,
+        "unit": "mm",
+        "canonical_value": 0.0009167243808034075,
+        "canonical_unit": "m"
+      },
+      "candidate": {
+        "value": 0.8205422709495548,
+        "unit": "mm",
+        "canonical_value": 0.0008205422709495548,
+        "canonical_unit": "m"
+      },
+      "absolute_change": -9.618210985385268e-05,
+      "percent_change": -10.491933220927287
+    },
+    "min_factor_of_safety": {
+      "available": true,
+      "baseline": {
+        "value": 3.4483220076453835,
+        "unit": "-",
+        "canonical_value": 3.4483220076453835,
+        "canonical_unit": "-"
+      },
+      "candidate": {
+        "value": 2.4385551597051127,
+        "unit": "-",
+        "canonical_value": 2.4385551597051127,
+        "canonical_unit": "-"
+      },
+      "absolute_change": -1.0097668479402708,
+      "percent_change": -29.28284672085394
+    },
+    "compliance_j": {
+      "available": true,
+      "baseline": {
+        "value": 0.7670580905561364,
+        "unit": "J",
+        "canonical_value": 0.7670580905561364,
+        "canonical_unit": "J"
+      },
+      "candidate": {
+        "value": 0.6809379618740059,
+        "unit": "J",
+        "canonical_value": 0.6809379618740059,
+        "canonical_unit": "J"
+      },
+      "absolute_change": -0.08612012868213048,
+      "percent_change": -11.227328117964472
+    }
+  },
+  "mesh_convergence": {
+    "performed": true,
+    "coarse_preset": "exploration",
+    "fine_preset": "verification",
+    "coarse_nodes": 9245,
+    "fine_nodes": 15221,
+    "metrics": {
+      "mass_kg": {
+        "available": true,
+        "coarse": 8.991272112581093,
+        "fine": 8.991272112581093,
+        "relative_change": 0.0,
+        "percent_change": 0.0,
+        "converged": true
+      },
+      "max_von_mises_pa": {
+        "available": true,
+        "coarse": 84066173.03042267,
+        "fine": 83366608.6848579,
+        "relative_change": -0.008321591436208267,
+        "percent_change": -0.8321591436208267,
+        "converged": true
+      },
+      "max_displacement_m": {
+        "available": true,
+        "coarse": 0.0008205422709495548,
+        "fine": 0.0008246564395559637,
+        "relative_change": 0.005013963024290996,
+        "percent_change": 0.5013963024290996,
+        "converged": true
+      },
+      "min_factor_of_safety": {
+        "available": true,
+        "coarse": 2.4385551597051127,
+        "fine": 2.45901810369833,
+        "relative_change": 0.008391421416807997,
+        "percent_change": 0.8391421416807997,
+        "converged": true
+      },
+      "compliance_j": {
+        "available": true,
+        "coarse": 0.6809379618740059,
+        "fine": 0.6830984271038476,
+        "relative_change": 0.0031727783598610015,
+        "percent_change": 0.31727783598610015,
+        "converged": true
+      }
+    },
+    "converged": true,
+    "tolerance": 0.1,
+    "statement": "Re-solving the recommended design on a refined mesh (9245 to 15221 nodes) changed every reported metric by at most 0.8%, within the 10% tolerance, and the feasibility verdict is unchanged. The result is mesh-converged for these metrics.",
+    "fine_candidate_id": "cand_e97ddd550f41",
+    "coarse_feasible": true,
+    "fine_feasible": true,
+    "verdict_changed": false,
+    "fine_constraint_results": [
+      {
+        "constraint_id": "stress_limit",
+        "metric": "max_von_mises_pa",
+        "label": "Peak stress within allowable",
+        "operator": "lte",
+        "description": "max_von_mises_pa <= 120.0 MPa",
+        "source_status": "user_supplied",
+        "source_reference": "Allowable von Mises stress supplied in engineering setup",
+        "value": {
+          "value": 83.36660868485791,
+          "unit": "MPa",
+          "canonical_value": 83366608.6848579,
+          "canonical_unit": "Pa"
+        },
+        "limit": {
+          "value": 120.0,
+          "unit": "MPa",
+          "canonical_value": 120000000.0,
+          "canonical_unit": "Pa"
+        },
+        "lower": null,
+        "upper": null,
+        "passed": true,
+        "margin_fraction": 0.30527826095951743,
+        "note": null
+      },
+      {
+        "constraint_id": "displacement_limit",
+        "metric": "max_displacement_m",
+        "label": "Deflection within allowable",
+        "operator": "lte",
+        "description": "max_displacement_m <= 1.2 mm",
+        "source_status": "user_supplied",
+        "source_reference": "Allowable deflection supplied in engineering setup",
+        "value": {
+          "value": 0.8246564395559637,
+          "unit": "mm",
+          "canonical_value": 0.0008246564395559637,
+          "canonical_unit": "m"
+        },
+        "limit": {
+          "value": 1.2,
+          "unit": "mm",
+          "canonical_value": 0.0012,
+          "canonical_unit": "m"
+        },
+        "lower": null,
+        "upper": null,
+        "passed": true,
+        "margin_fraction": 0.3127863003700302,
+        "note": null
+      },
+      {
+        "constraint_id": "manufacturing_min_wall",
+        "metric": "min_wall_thickness_m",
+        "label": "Manufacturable wall thickness",
+        "operator": "gte",
+        "description": "min_wall_thickness_m >= 6.0 mm",
+        "source_status": "user_supplied",
+        "source_reference": "Casting minimum wall thickness supplied in engineering setup",
+        "value": {
+          "value": 9.540025127879133,
+          "unit": "mm",
+          "canonical_value": 0.009540025127879133,
+          "canonical_unit": "m"
+        },
+        "limit": {
+          "value": 6.0,
+          "unit": "mm",
+          "canonical_value": 0.006,
+          "canonical_unit": "m"
+        },
+        "lower": null,
+        "upper": null,
+        "passed": true,
+        "margin_fraction": 0.5900041879798555,
+        "note": null
+      }
+    ],
+    "unconverged_metrics": []
+  },
+  "specification": {
+    "component_type": "alloy_wheel",
+    "design_mode": "generate_new",
+    "analysis_type": "linear_static_structural",
+    "unit_system": "SI_canonical",
+    "objective_summary": "Explore spoke, hub and rim-wall proportions that reduce wheel mass while keeping peak stress and radial deflection inside configured limits and preserving every vehicle interface.",
+    "material_id": "al_a356_t6",
+    "material_assignments": {},
+    "parameters": {
+      "rim_diameter_m": 0.4318,
+      "rim_width_m": 0.1905,
+      "center_bore_diameter_m": 0.0666,
+      "bolt_count": 5.0,
+      "bolt_circle_diameter_m": 0.112,
+      "bolt_hole_diameter_m": 0.014,
+      "hub_pad_diameter_m": 0.16,
+      "spoke_count": 7.0,
+      "spoke_root_width_m": 0.044,
+      "spoke_tip_width_m": 0.03,
+      "spoke_thickness_m": 0.016,
+      "spoke_dish_offset_m": 0.085,
+      "hub_thickness_m": 0.02,
+      "rim_wall_thickness_m": 0.008
+    },
+    "design_variables": [
+      "spoke_count",
+      "spoke_root_width_m",
+      "spoke_tip_width_m",
+      "spoke_thickness_m",
+      "spoke_dish_offset_m",
+      "hub_thickness_m",
+      "rim_wall_thickness_m"
+    ],
+    "load_cases": [
+      {
+        "case_id": "radial_road_load",
+        "name": "Radial road load",
+        "analysis_type": "linear_static_structural",
+        "description": "4500 N radial load applied over a 50-degree sector of the rim outer surface, with the bolt holes and hub mounting face fixed. Simplified representative load case.",
+        "loads": [
+          {
+            "type": "force",
+            "region": "rim_contact_patch",
+            "magnitude": {
+              "value": 4500.0,
+              "unit": "N"
+            },
+            "direction": [
+              0.0,
+              -1.0,
+              0.0
+            ],
+            "note": "Resultant road load acting towards the contact patch."
+          }
+        ],
+        "supports": [
+          {
+            "type": "fixed",
+            "region": "bolt_hole_bearing_surfaces",
+            "note": "Simplified clamped bolted joint."
+          },
+          {
+            "type": "fixed",
+            "region": "hub_mounting_face",
+            "note": "Mounting pad seated against the hub flange."
+          }
+        ],
+        "thermal_boundary_conditions": [],
+        "assumptions": []
+      }
+    ],
+    "objectives": [
+      {
+        "objective_id": "minimize_mass",
+        "metric": "mass_kg",
+        "sense": "minimize",
+        "weight": 1.0,
+        "label": "Minimise wheel mass"
+      },
+      {
+        "objective_id": "minimize_peak_stress",
+        "metric": "max_von_mises_pa",
+        "sense": "minimize",
+        "weight": 1.0,
+        "label": "Minimise peak von Mises stress"
+      }
+    ],
+    "constraints": [
+      {
+        "constraint_id": "stress_limit",
+        "metric": "max_von_mises_pa",
+        "operator": "lte",
+        "limit": {
+          "value": 120.0,
+          "unit": "MPa"
+        },
+        "lower": null,
+        "upper": null,
+        "source_status": "user_supplied",
+        "source_reference": "Allowable von Mises stress supplied in engineering setup",
+        "label": "Peak stress within allowable"
+      },
+      {
+        "constraint_id": "displacement_limit",
+        "metric": "max_displacement_m",
+        "operator": "lte",
+        "limit": {
+          "value": 1.2,
+          "unit": "mm"
+        },
+        "lower": null,
+        "upper": null,
+        "source_status": "user_supplied",
+        "source_reference": "Allowable deflection supplied in engineering setup",
+        "label": "Deflection within allowable"
+      },
+      {
+        "constraint_id": "manufacturing_min_wall",
+        "metric": "min_wall_thickness_m",
+        "operator": "gte",
+        "limit": {
+          "value": 6.0,
+          "unit": "mm"
+        },
+        "lower": null,
+        "upper": null,
+        "source_status": "user_supplied",
+        "source_reference": "Casting minimum wall thickness supplied in engineering setup",
+        "label": "Manufacturable wall thickness"
+      }
+    ],
+    "manufacturing_constraints": [],
+    "mesh_settings": {
+      "target_element_size_m": 0.0112,
+      "min_element_size_m": 0.00504,
+      "element_order": 2,
+      "optimize_quality": true,
+      "max_nodes": 200000
+    },
+    "solver_settings": {
+      "solver_id": "skfem_linear_static",
+      "timeout_seconds": 600,
+      "options": {}
+    },
+    "assumptions": [
+      {
+        "key": "radial_load_demo_fixture",
+        "statement": "The 4500 N default radial load is a demonstration fixture chosen to represent a loaded passenger-car corner with a dynamic factor. It is not taken from a vehicle specification or a test standard.",
+        "source_status": "demo_fixture",
+        "source_reference": null,
+        "requires_confirmation": true,
+        "confirmed": false
+      },
+      {
+        "key": "load_introduction_simplification",
+        "statement": "The road load is applied as a uniform traction over a 50-degree sector of the rim outer surface. A real wheel is loaded through the tyre bead seats with inflation pressure and contact; that is not modelled.",
+        "source_status": "demo_fixture",
+        "source_reference": null,
+        "requires_confirmation": true,
+        "confirmed": false
+      },
+      {
+        "key": "bolted_joint_simplification",
+        "statement": "The bolted joint is represented by fully fixing the bolt-hole barrels and the hub mounting face. Bolt pretension, friction and contact separation are not modelled, so stress near the bolt holes is indicative only.",
+        "source_status": "demo_fixture",
+        "source_reference": null,
+        "requires_confirmation": true,
+        "confirmed": false
+      },
+      {
+        "key": "allowable_stress_demo_fixture",
+        "statement": "The 120 MPa default allowable stress is a demonstration value. Replace it with the allowable from your own design standard, derived from certified material data and your required safety factor.",
+        "source_status": "demo_fixture",
+        "source_reference": null,
+        "requires_confirmation": true,
+        "confirmed": false
+      },
+      {
+        "key": "allowable_deflection_demo_fixture",
+        "statement": "The 1.2 mm default allowable deflection is a demonstration serviceability limit, not a value from any standard. It was chosen to sit inside the range this simplified template produces so that the constraint is genuinely active across the design space - candidates with thin rim walls or small dish offsets do exceed it. Replace it with your own stiffness requirement.",
+        "source_status": "demo_fixture",
+        "source_reference": null,
+        "requires_confirmation": true,
+        "confirmed": false
+      },
+      {
+        "key": "barrel_stiffness_conservatism",
+        "statement": "The rim is modelled as a constant-wall barrel with no bead flanges and no drop centre. Those features stiffen a production wheel substantially, so the deflection computed here is expected to be larger than a real wheel of the same mass. Treat the deflection numbers as conservative and comparative between candidates rather than as absolute predictions.",
+        "source_status": "demo_fixture",
+        "source_reference": null,
+        "requires_confirmation": false,
+        "confirmed": false
+      },
+      {
+        "key": "geometry_simplification",
+        "statement": "Simplified one-piece cast-wheel template: constant-wall rim barrel, flat mounting hub, and tapered spokes dished axially from the mounting face to the rim. Bead-seat profile, humps, bead flanges, drop centre, fillet radii and casting draft angles are not modelled. Rim outer diameter, rim width, centre bore, bolt pattern and hub pad diameter are preserved interfaces and cannot be changed by the optimizer.",
+        "source_status": "demo_fixture",
+        "source_reference": null,
+        "requires_confirmation": false,
+        "confirmed": false
+      }
+    ],
+    "requested_candidate_budget": 7,
+    "random_seed": 20261102
+  }
+}

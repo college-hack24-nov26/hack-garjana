@@ -1,0 +1,21 @@
+/* Alloy wheel module styles that belong to the module itself (rig mode). */
+.state-chip.rig { color: #5eead4; border-color: rgba(94, 234, 212, 0.55); background: rgba(19, 78, 74, 0.55); }
+.rig-verdict {
+  display: inline-block; margin-left: 8px; vertical-align: middle; font-family: var(--mono); font-size: 10px; font-weight: 700;
+  letter-spacing: 0.05em; text-transform: uppercase; padding: 2px 6px; border-radius: 4px; border: 1px solid;
+}
+.rig-verdict.pass { color: var(--green); border-color: rgba(52, 211, 153, 0.45); background: var(--green-soft); }
+.rig-verdict.fail { color: var(--red); border-color: rgba(248, 113, 113, 0.5); background: var(--red-soft); }
+.rig-verdict::before { margin-right: 4px; }
+.rig-verdict.pass::before { content: '✓'; }
+.rig-verdict.fail::before { content: '✕'; }
+.force-label.m { color: #5eead4; }
+
+/* Wheel Design Lab: front-view outline of A vs B */
+.wheel-outline { display: block; width: 100%; max-width: 320px; margin: 4px auto 0; aspect-ratio: 1; }
+.wheel-outline .rim { fill: none; stroke: var(--border-strong); stroke-width: 6; }
+.wheel-outline .rim-inner { fill: none; stroke: var(--border); stroke-width: 2; stroke-dasharray: 6 5; }
+.wheel-outline .hub { fill: var(--surface-3); stroke: var(--border-strong); stroke-width: 2; }
+.wheel-outline .cap { fill: var(--bg); stroke: var(--border-strong); stroke-width: 2; }
+.wheel-outline .spokes-b { fill: rgba(56, 189, 248, 0.28); stroke: var(--accent-2); stroke-width: 2; }
+.wheel-outline .spokes-a { fill: none; stroke: var(--amber); stroke-width: 2.5; stroke-dasharray: 7 4; }

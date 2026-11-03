@@ -1,0 +1,488 @@
+{
+  "verification": {
+    "status": "unverified",
+    "benchmark_id": "cantilever_beam_linear_static",
+    "pre_solver": {
+      "stage": "pre_solver",
+      "checks": [
+        {
+          "check_id": "unit_consistency",
+          "stage": "pre_solver",
+          "title": "Unit consistency",
+          "description": "Every quantity entering the solver converts to canonical SI.",
+          "status": "passed",
+          "severity": "blocking",
+          "measured": 5.0,
+          "threshold": null,
+          "unit": null,
+          "detail": "5 unit-carrying quantities converted to canonical SI (m, N, Pa, kg, K, W/(m·K))."
+        },
+        {
+          "check_id": "dimensional_plausibility",
+          "stage": "pre_solver",
+          "title": "Dimensional plausibility",
+          "description": "The solid's overall size falls inside the envelope for its component type.",
+          "status": "passed",
+          "severity": "blocking",
+          "measured": 0.13,
+          "threshold": null,
+          "unit": "m",
+          "detail": "Largest overall dimension 130.0 mm, inside the 30-500 mm envelope."
+        },
+        {
+          "check_id": "material_completeness",
+          "stage": "pre_solver",
+          "title": "Material property completeness",
+          "description": "Every assigned material carries the properties this analysis consumes.",
+          "status": "passed",
+          "severity": "blocking",
+          "measured": 1.0,
+          "threshold": null,
+          "unit": null,
+          "detail": "1 material assignment(s) carry every property this analysis consumes, each with a declared condition."
+        },
+        {
+          "check_id": "geometry_integrity",
+          "stage": "pre_solver",
+          "title": "Geometry integrity",
+          "description": "The solid is valid, watertight and has positive volume.",
+          "status": "passed",
+          "severity": "blocking",
+          "measured": 0.0007435270578271795,
+          "threshold": null,
+          "unit": "m3",
+          "detail": "1 valid solid(s), 743.5 cm3 total."
+        },
+        {
+          "check_id": "interface_invariance",
+          "stage": "pre_solver",
+          "title": "Preserved interface invariance",
+          "description": "Protected interfaces measure what the specification requires.",
+          "status": "passed",
+          "severity": "blocking",
+          "measured": 0.0,
+          "threshold": 0.001,
+          "unit": "m",
+          "detail": "3 protected interface(s) held; largest deviation 0.00000 mm against an applied tolerance of 1.000 mm. This proves the interface to 1.000 mm, not to the 0.001 mm target: the measurement is taken on the tessellated solid, which cannot resolve finer. The deviation measured is well inside that, but only the applied tolerance is proven."
+        },
+        {
+          "check_id": "semantic_region_mapping",
+          "stage": "pre_solver",
+          "title": "Semantic region mapping",
+          "description": "Every boundary condition names a region the generator actually built.",
+          "status": "passed",
+          "severity": "blocking",
+          "measured": 3.0,
+          "threshold": null,
+          "unit": null,
+          "detail": "3 boundary condition(s) mapped to named semantic regions out of 5 available."
+        },
+        {
+          "check_id": "force_path_declaration",
+          "stage": "pre_solver",
+          "title": "Force-path declaration",
+          "description": "Pressure, piston force and reaction force are distinguished, not conflated.",
+          "status": "passed",
+          "severity": "blocking",
+          "measured": 0.0018095573684677208,
+          "threshold": null,
+          "unit": "m2",
+          "detail": "10.00 MPa on 'piston_bore_surfaces' over a 48.0 mm bore (1810 mm2) gives a piston force of 18.10 kN. The pad reaction enters separately as 1 force load(s), so the clamping path is self-equilibrating and each load is verified on its own."
+        },
+        {
+          "check_id": "thermal_boundary_consistency",
+          "stage": "pre_solver",
+          "title": "Thermal boundary consistency",
+          "description": "A conduction model has both a heat input and a sink path, with consistent signs.",
+          "status": "not_applicable",
+          "severity": "blocking",
+          "measured": null,
+          "threshold": null,
+          "unit": null,
+          "detail": "This is a structural analysis; it has no thermal boundary conditions."
+        },
+        {
+          "check_id": "mesh_quality",
+          "stage": "pre_solver",
+          "title": "Mesh element quality",
+          "description": "No inverted or near-degenerate elements, measured by the gamma ratio.",
+          "status": "passed",
+          "severity": "blocking",
+          "measured": 0.29643022716427997,
+          "threshold": 0.1,
+          "unit": null,
+          "detail": "Worst element gamma 0.296, mean 0.807 over 11243 elements; 0 below 0.1."
+        },
+        {
+          "check_id": "mesh_volume_fidelity",
+          "stage": "pre_solver",
+          "title": "Mesh volume fidelity",
+          "description": "The meshed volume matches the CAD volume.",
+          "status": "passed",
+          "severity": "blocking",
+          "measured": 0.001405606779607087,
+          "threshold": 0.02,
+          "unit": null,
+          "detail": "Meshed volume 744.6 cm3 against a CAD volume of 743.5 cm3, a 0.141% difference (tolerance 2%)."
+        }
+      ]
+    },
+    "post_solver": {
+      "stage": "post_solver",
+      "checks": [
+        {
+          "check_id": "result_field_integrity",
+          "stage": "post_solver",
+          "title": "Result field integrity",
+          "description": "The stored result field is present, complete and finite.",
+          "status": "passed",
+          "severity": "blocking",
+          "measured": 2126.0,
+          "threshold": null,
+          "unit": null,
+          "detail": "2126 nodes and 4248 surface triangles read back from result_fields_clamping_load.npz; every value finite across 4 stored arrays."
+        },
+        {
+          "check_id": "decision_metric_present",
+          "stage": "post_solver",
+          "title": "Decision metric present",
+          "description": "The analysis produced the quantity the decision depends on.",
+          "status": "passed",
+          "severity": "blocking",
+          "measured": 175956387.29673365,
+          "threshold": null,
+          "unit": null,
+          "detail": "max_von_mises_pa = 1.75956e+08 (canonical SI), alongside 6 further computed metrics."
+        },
+        {
+          "check_id": "load_balance",
+          "stage": "post_solver",
+          "title": "Load and reaction balance",
+          "description": "Each assembled load integrates back to its intended resultant.",
+          "status": "passed",
+          "severity": "blocking",
+          "measured": 4.1359899331495715e-16,
+          "threshold": 0.02,
+          "unit": null,
+          "detail": "2 load(s) verified individually against an independent reference; worst relative error 0.000% (tolerance 2%)."
+        },
+        {
+          "check_id": "region_application_coverage",
+          "stage": "post_solver",
+          "title": "Boundary condition coverage",
+          "description": "Every boundary condition resolved to a non-zero mesh area.",
+          "status": "passed",
+          "severity": "blocking",
+          "measured": 0.000906770201599469,
+          "threshold": null,
+          "unit": "m2",
+          "detail": "3 boundary condition(s) applied; smallest resolved area 906.8 mm2."
+        },
+        {
+          "check_id": "energy_balance",
+          "stage": "post_solver",
+          "title": "Energy balance",
+          "description": "Every boundary is accounted for and the assembled system conserves energy. This is a consistency check, not an accuracy one.",
+          "status": "passed",
+          "severity": "blocking",
+          "measured": 4.777810593726382e-13,
+          "threshold": 0.02,
+          "unit": "J",
+          "detail": "external work f.u against internal strain energy u'Ku: 1.40212 J in against 1.40212 J out, a 0.0000% imbalance (tolerance 2%). A closed balance shows the model is self-consistent; it does not show the mesh is fine enough, which the convergence check covers separately."
+        },
+        {
+          "check_id": "linear_solver_residual",
+          "stage": "post_solver",
+          "title": "Linear solve residual",
+          "description": "The linear system converged to the required relative residual.",
+          "status": "passed",
+          "severity": "blocking",
+          "measured": 3.631466716374519e-12,
+          "threshold": 1e-6,
+          "unit": null,
+          "detail": "sparse direct factorisation (SuperLU) reached a relative residual of 3.631e-12 against an acceptance threshold of 1.0e-06."
+        },
+        {
+          "check_id": "benchmark_verification",
+          "stage": "post_solver",
+          "title": "Analytical benchmark",
+          "description": "This solver path reproduces a closed-form reference solution.",
+          "status": "passed",
+          "severity": "blocking",
+          "measured": null,
+          "threshold": null,
+          "unit": null,
+          "detail": "End-loaded cantilever 200 x 20 x 20 mm, E = 210 GPa, nu = 0.3, tip load 1000 N, clamped at x = 0. matched its closed-form reference (Euler-Bernoulli tip deflection PL^3/(3EI) with the Timoshenko shear correction PL/(kGA), k = 5/6; peak bending stress M c / I.). Worst quantity error 1.569%."
+        },
+        {
+          "check_id": "mesh_convergence",
+          "stage": "post_solver",
+          "title": "Mesh convergence (decision quantity)",
+          "description": "The quantity the decision rests on is stable under mesh refinement.",
+          "status": "not_run",
+          "severity": "blocking",
+          "measured": null,
+          "threshold": null,
+          "unit": null,
+          "detail": "This candidate was not re-solved on a refined mesh, so its result has not been shown to be mesh-independent."
+        },
+        {
+          "check_id": "mesh_convergence_region_metrics",
+          "stage": "post_solver",
+          "title": "Mesh convergence (region metrics)",
+          "description": "The region-specific metrics are stable under mesh refinement.",
+          "status": "not_run",
+          "severity": "advisory",
+          "measured": null,
+          "threshold": null,
+          "unit": null,
+          "detail": "No refinement study was run, so there is nothing to compare."
+        }
+      ]
+    },
+    "unit_check_passed": true,
+    "geometry_integrity_passed": true,
+    "interface_invariance_passed": true,
+    "region_mapping_passed": true,
+    "mesh_quality_passed": true,
+    "load_balance_passed": true,
+    "energy_balance_passed": true,
+    "benchmark_passed": true,
+    "mesh_convergence_passed": null,
+    "mesh_convergence_status": "not_run",
+    "reaction_balance_error": 4.1359899331495715e-16,
+    "energy_balance_error": 4.777810593726382e-13,
+    "warnings": [],
+    "blocking_failures": [],
+    "evidence_gaps": [
+      "Mesh convergence (decision quantity): This candidate was not re-solved on a refined mesh, so its result has not been shown to be mesh-independent."
+    ]
+  },
+  "validation": {
+    "status": "not_available",
+    "dataset_id": null,
+    "measurement_basis": null,
+    "predicted": null,
+    "measured": null,
+    "measurement_uncertainty": null,
+    "relative_error": null,
+    "unit": null,
+    "dataset_used_for_calibration": false,
+    "statement": "No physical measurement has been compared against this prediction. Physical validation status is not available, which is distinct from having been validated and distinct from having failed."
+  },
+  "uncertainty": {
+    "numerical_error_sources": [
+      "finite-element discretisation",
+      "iterative linear solve residual",
+      "nodal projection of element-wise stress"
+    ],
+    "solver_residual": 3.631466716374519e-12,
+    "discretization_sensitivity": null,
+    "model_discrepancy": null,
+    "measurement_uncertainty": null,
+    "stated_prediction_interval": null,
+    "note": "Numerical error is bounded by the recorded residual and the mesh sensitivity. Model discrepancy against a physical part is not quantified, because no physical measurement exists for this model."
+  },
+  "maturity": {
+    "level": "simulation_evaluated",
+    "level_ordinal": 1,
+    "label": "Simulation-evaluated candidate",
+    "basis": [
+      "A valid parametric solid was built and passed the geometry gate.",
+      "A solver ran to completion, its fields were parsed and the configured constraints were evaluated against computed metrics."
+    ],
+    "blocked_from": "numerically_verified",
+    "blocking_reasons": [
+      "not every assurance check produced a pass",
+      "no mesh-refinement study was run, so the result has not been shown to be mesh-independent"
+    ],
+    "evidence_requirement": "A mesh was generated, a solver ran to completion, its result fields parsed, and the configured constraints were evaluated against metrics the solver computed.",
+    "prohibited_claims": [
+      "Feasible only under this specific solver model, mesh and load case.",
+      "No road-safety, durability, fatigue-life or production-release claim.",
+      "No claim of numerical accuracy - the verification gates have not all passed."
+    ],
+    "intended_use_domain": "Comparative structural screening of caliper body geometries under a declared equivalent clamping load at the mounting condition stated. Isothermal, with no contact mechanics and no disc interaction. Ladder rung C1.",
+    "last_evidence_date": "2026-11-03",
+    "unresolved_limitations": [
+      "C2 not attained: The solver path is linear with no contact mechanics. Piston, pad, disc and carrier are not modelled; their effect is collapsed into a declared equivalent clamping load.",
+      "No physical measurement has been compared against this prediction. Physical validation status is not available, which is distinct from having been validated and distinct from having failed."
+    ],
+    "derivation": "Derived deterministically from recorded evidence. No language model assigns or raises this level."
+  },
+  "evidence": {
+    "requirement_revision": "537857b6a7d7f376",
+    "geometry_hash": "89ec715551376a2bc5763725b1eaae39",
+    "material_snapshot_hash": "dc62fce61a7a10b8cf9b0d4c4d86b2da",
+    "load_case_hash": "deb10011ddbff155f7a13ba654c474a6",
+    "mesh_hash": "d8492da2ae3f0745a686376266b3e42d",
+    "solver_input_hash": "595b43a67a2ae7c52b3e6a9a22579390",
+    "solver_name": "scikit-fem linear elasticity (quadratic tetrahedra)",
+    "solver_version": "skfem-12.0.2",
+    "generator_version": "1.0.0",
+    "code_commit": "e4fc664",
+    "recorded_at": "2026-11-03T21:51:29+00:00",
+    "provenance": [
+      {
+        "key": "material.primary",
+        "label": "EN-GJS-400-18 ductile (spheroidal graphite) cast iron (primary)",
+        "value": 169000000000.0,
+        "unit": "Pa",
+        "source_type": "literature",
+        "source_id": "iron_gjs_400_18",
+        "source_reference": null,
+        "revision": "1.0.0",
+        "confirmed": false,
+        "uncertainty": null,
+        "note": "Condition: As-cast ferritic matrix, EN-GJS-400-18 grade (400 MPa UTS / 18% elongation class). Illustrative handbook-class value, not supplier-certified."
+      },
+      {
+        "key": "load.piston_bore_surfaces.pressure",
+        "label": "pressure on piston_bore_surfaces",
+        "value": 10000000.0,
+        "unit": "Pa",
+        "source_type": "user_supplied",
+        "source_id": null,
+        "source_reference": "Hydraulic pressure acting on the bore pocket wall and base.",
+        "revision": null,
+        "confirmed": true,
+        "uncertainty": null,
+        "note": null
+      },
+      {
+        "key": "load.outboard_pad_abutment.force",
+        "label": "force on outboard_pad_abutment",
+        "value": 18095.57368467721,
+        "unit": "N",
+        "source_type": "user_supplied",
+        "source_id": null,
+        "source_reference": "Outboard pad reaction pushing the outboard leg away from the disc, which is what opens the caliper mouth.",
+        "revision": null,
+        "confirmed": true,
+        "uncertainty": null,
+        "note": null
+      },
+      {
+        "key": "constraint.stress_limit",
+        "label": "Peak stress within allowable",
+        "value": 165000000.0,
+        "unit": "MPa",
+        "source_type": "user_supplied",
+        "source_id": null,
+        "source_reference": "Allowable von Mises stress supplied in engineering setup",
+        "revision": null,
+        "confirmed": true,
+        "uncertainty": null,
+        "note": null
+      },
+      {
+        "key": "constraint.mouth_opening_limit",
+        "label": "Mouth opening within allowable",
+        "value": 0.00015,
+        "unit": "mm",
+        "source_type": "user_supplied",
+        "source_id": null,
+        "source_reference": "Allowable mouth opening supplied in engineering setup",
+        "revision": null,
+        "confirmed": true,
+        "uncertainty": null,
+        "note": null
+      },
+      {
+        "key": "constraint.manufacturing_min_wall",
+        "label": "Manufacturable wall thickness",
+        "value": 0.007,
+        "unit": "mm",
+        "source_type": "user_supplied",
+        "source_id": null,
+        "source_reference": "Casting minimum wall thickness supplied in engineering setup",
+        "revision": null,
+        "confirmed": true,
+        "uncertainty": null,
+        "note": null
+      },
+      {
+        "key": "assumption.hydraulic_pressure_demo_fixture",
+        "label": "The 10 MPa default line pressure is a demonstration fixture representing a firm brake application. It is not taken from a vehicle brake-system specification.",
+        "value": null,
+        "unit": "-",
+        "source_type": "demo_assumption",
+        "source_id": null,
+        "source_reference": null,
+        "revision": null,
+        "confirmed": false,
+        "uncertainty": null,
+        "note": null
+      },
+      {
+        "key": "assumption.clamping_load_model",
+        "label": "The clamping load is modelled as hydraulic pressure on the piston bore pocket plus an equal and opposite resultant force spread over the outboard pad abutment face. The piston, pads and disc are not modelled, and pad pressure distribution is assumed uniform.",
+        "value": null,
+        "unit": "-",
+        "source_type": "demo_assumption",
+        "source_id": null,
+        "source_reference": null,
+        "revision": null,
+        "confirmed": false,
+        "uncertainty": null,
+        "note": null
+      },
+      {
+        "key": "assumption.mounting_constraint_simplification",
+        "label": "The two mounting hole barrels are fully fixed. Bolt pretension, friction and contact separation at the knuckle are not modelled, so stress around the mounting holes is indicative only.",
+        "value": null,
+        "unit": "-",
+        "source_type": "demo_assumption",
+        "source_id": null,
+        "source_reference": null,
+        "revision": null,
+        "confirmed": false,
+        "uncertainty": null,
+        "note": null
+      },
+      {
+        "key": "assumption.brake_torque_not_modelled",
+        "label": "Only the clamping (mouth-opening) load case is analysed. The brake torque reaction that acts circumferentially through the mounting bolts is a separate load case and is not included here.",
+        "value": null,
+        "unit": "-",
+        "source_type": "demo_assumption",
+        "source_id": null,
+        "source_reference": null,
+        "revision": null,
+        "confirmed": false,
+        "uncertainty": null,
+        "note": null
+      },
+      {
+        "key": "assumption.allowable_stress_demo_fixture",
+        "label": "The 165 MPa default allowable stress is a demonstration value derived as roughly the 250 MPa catalog yield of EN-GJS-400-18 divided by a safety factor of 1.5. The 0.15 mm default mouth opening limit is likewise illustrative. Both are stated so the constraint is active across the design space; replace them with limits from your own design standard and certified material data.",
+        "value": null,
+        "unit": "-",
+        "source_type": "demo_assumption",
+        "source_id": null,
+        "source_reference": null,
+        "revision": null,
+        "confirmed": false,
+        "uncertainty": null,
+        "note": null
+      },
+      {
+        "key": "assumption.geometry_simplification",
+        "label": "Simplified fixed-caliper body template: U-shaped channel over the disc, piston bore pocket in the inboard leg, mounting holes through the inboard leg, optional bridge ribs. The hydraulic circuit, seal grooves, pistons, pads, disc, and casting draft are not modelled. Disc slot width, piston bore diameter, mounting hole pattern and body length are preserved interfaces and cannot be changed by the optimizer.",
+        "value": null,
+        "unit": "-",
+        "source_type": "demo_assumption",
+        "source_id": null,
+        "source_reference": null,
+        "revision": null,
+        "confirmed": false,
+        "uncertainty": null,
+        "note": null
+      }
+    ]
+  },
+  "ladder_level": "C1",
+  "ladder_release_label": "Simulation evaluated under a declared equivalent load.",
+  "ladder_next_gap": "C2 (Piston-pad-disc-caliper-carrier assembly with resolved contacts.) is not attained: The solver path is linear with no contact mechanics. Piston, pad, disc and carrier are not modelled; their effect is collapsed into a declared equivalent clamping load.",
+  "fidelity_level": "F2"
+}

@@ -1,0 +1,18 @@
+{
+  "parameters": {
+    "body_length_m": 0.13,
+    "disc_slot_width_m": 0.034,
+    "piston_bore_diameter_m": 0.048,
+    "mount_hole_diameter_m": 0.012,
+    "mount_hole_spacing_m": 0.096,
+    "wall_thickness_m": 0.022480929384842238,
+    "bridge_thickness_m": 0.013980825361803288,
+    "body_height_m": 0.11002181026783206,
+    "slot_depth_fraction": 0.5638988298071268,
+    "rib_count": 2.0,
+    "rib_thickness_m": 0.010404763524452569
+  },
+  "generator": "brake_caliper_parametric",
+  "generator_version": "1.0.0",
+  "geometry_hash": "c541855e3a84e7f18fc0925c91cf211b"
+}

@@ -1,0 +1,24 @@
+/* "Run on solver" panel (SolverRunPanel.tsx). Uses the app's existing tokens and classes. */
+.solver-head-right { display: flex; align-items: center; gap: 8px; }
+.solver-body { display: flex; flex-direction: column; gap: 12px; }
+.solver-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.solver-col { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.solver-panel code { font-family: var(--mono); font-size: 11px; }
+.solver-assume ul, .solver-panel .note ul, .solver-warn ul { margin: 6px 0 4px; padding-left: 18px; font-size: 11.5px; line-height: 1.55; color: var(--text-2); }
+.solver-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.solver-actions .btn:disabled { opacity: 0.55; cursor: progress; }
+.solver-job { display: flex; flex-direction: column; gap: 6px; }
+.solver-job-row { display: flex; align-items: center; gap: 10px; font-size: 12px; }
+.solver-bar { height: 5px; border-radius: 3px; background: var(--surface-3); overflow: hidden; }
+.solver-bar > div { height: 100%; background: var(--accent-2); transition: width 0.4s ease; }
+.solver-study { display: flex; flex-direction: column; gap: 8px; }
+.solver-table th { white-space: normal; vertical-align: bottom; min-width: 90px; }
+.solver-table td.r, .solver-table td:first-child, .solver-table td:nth-child(2) { white-space: nowrap; }
+.data-table.plain.solver-table td.solver-fail { color: #fca5a5; }
+.solver-table tr.solver-rec td { background: var(--green-soft); }
+.solver-rec-tag { margin-left: 6px; }
+.solver-notes { color: var(--text-2); font-size: 11px; max-width: 340px; }
+.solver-warn summary { cursor: pointer; font-size: 11.5px; color: var(--amber); }
+@media (max-width: 760px) {
+  .solver-grid { grid-template-columns: 1fr; }
+}

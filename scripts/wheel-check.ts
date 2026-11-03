@@ -129,5 +129,54 @@ const near = (a: number, b: number, tol: number) => Math.abs(a - b) <= tol;
   check('damage integrates rate × revolutions', near(sim.state.damage - d0, expected, expected * 0.02 + 1e-18), `${(sim.state.damage - d0).toExponential(2)} vs ${expected.toExponential(2)}`);
 }
 
+// 5. Test rigs.
+{
+  const rig = new WheelSim({ scenario: 'rig-cornering' });
+  const p = rig.params;
+  const R = FIXED.tyreFreeRadius - p.staticLoadN / rig.tyreStiffness;
+  const M = (p.rigMu * R + FIXED.xMount) * p.staticLoadN * p.rigS;
+  check('cornering rig moment = (μR + d)·Fv·S', near(rig.rigMoment, M, 1e-9), `${M.toFixed(0)} N·m`);
+  check('cornering rig: no tyre load, all moment', rig.state.Fz === 0 && near(rig.state.moment, M, 1e-9));
+  rig.play();
+  rig.advanceSim(1);
+  check('cornering rig cycle is fully reversed (mean ≈ 0)', Math.abs(rig.state.meanMPa) < 0.02 * rig.state.ampMPa, `±${rig.state.ampMPa.toFixed(1)} about ${rig.state.meanMPa.toFixed(2)} MPa`);
+  check('cornering rig counts one cycle per turn', near(rig.cyclesToFailure, 1 / rig.state.damagePerRev, 1e-6));
+  const thin = new WheelSim({ scenario: 'rig-cornering', legWidthMm: 14, kt: 1.8 });
+  check('thin legs + Kt fail the cornering target that the drawing design passes', rig.cyclesToFailure > p.rigTargetCornering && thin.cyclesToFailure < p.rigTargetCornering, `${rig.cyclesToFailure.toExponential(1)} vs ${thin.cyclesToFailure.toExponential(1)} cycles`);
+
+  const drum = new WheelSim({ scenario: 'rig-radial' });
+  check('radial rig load = K·Fv', near(drum.state.Fz, drum.params.rigK * drum.params.staticLoadN, 1e-9), `${drum.state.Fz.toFixed(0)} N`);
+  check('radial rig: no lateral or drive force', drum.state.Fy === 0 && drum.state.Fx === 0);
+  const back = new WheelSim({ scenario: 'rig-radial' });
+  back.setParams({ scenario: 'cruise' });
+  check('leaving a rig restarts on the road at the static load', near(back.state.Fz, back.params.staticLoadN, 1e-9) && back.state.t === 0);
+}
+
+// 6. Design Lab: A/B estimates and checks.
+{
+  const { WheelLabStore, WHEEL_CANDIDATE } = await import('../src/modules/alloyWheel/lab/WheelLabStore.ts');
+  const { WHEEL_BASELINE, WHEEL_LAB_DEFAULTS, estimateWheel, wheelChecks, overallVerdict } = await import(
+    '../src/modules/alloyWheel/lab/evaluate.ts'
+  );
+  const lab = new WheelLabStore(false);
+  const twin = new WheelSim({ scenario: 'rig-cornering' });
+  check('lab A = the drawing design, same mass as the twin', near(lab.estimates.A.massKg, twin.mass.massKg, 1e-9), `${lab.estimates.A.massKg.toFixed(2)} kg`);
+  check('lab cornering-rig life matches the twin rig', near(lab.estimates.A.rigCorneringCycles, twin.cyclesToFailure, twin.cyclesToFailure * 1e-9));
+  check('drawing design passes every lab check', lab.verdicts.A === 'pass', lab.checks.A.map((r) => `${r.ruleId}:${r.status}`).join(' '));
+  check('candidate B is lighter than A', lab.estimates.B.massKg < lab.estimates.A.massKg, `${lab.estimates.A.massKg.toFixed(2)} → ${lab.estimates.B.massKg.toFixed(2)} kg`);
+  lab.copyAToB();
+  check('copy A → B gives identical estimates', near(lab.estimates.B.roadPeakMPa, lab.estimates.A.roadPeakMPa, 1e-12) && lab.designs.B.revision === WHEEL_CANDIDATE.revision);
+  lab.setDesign('B', { legWidthMm: 14, kt: 1.8 });
+  check('thin legs + Kt fail the cornering-rig check', lab.checks.B.find((r) => r.ruleId === 'wheel-rig-cornering')!.status === 'fail' && lab.verdicts.B === 'fail');
+  lab.setDesign('B', { legWidthMm: 999 });
+  check('lab clamps parameters to their ranges', lab.designs.B.legWidthMm === 30);
+  const steel = { ...WHEEL_BASELINE, materialId: 'alloy-steel' as const };
+  const e = estimateWheel(steel, WHEEL_LAB_DEFAULTS);
+  check('alloy steel: heavier, and passes stress with a bigger margin', e.massKg > 30 && overallVerdict(wheelChecks(steel, e, WHEEL_LAB_DEFAULTS)) === 'pass', `${e.massKg.toFixed(1)} kg, FoS ${e.fos.toFixed(1)}`);
+  const hard = { ...WHEEL_LAB_DEFAULTS, corneringG: 1.2, minFoS: 2 };
+  const eh = estimateWheel(WHEEL_BASELINE, hard);
+  check('harder design condition → stress check no longer passes', wheelChecks(WHEEL_BASELINE, eh, hard)[0].status !== 'pass', `${eh.roadPeakMPa.toFixed(0)} MPa vs ${(186 / 2).toFixed(0)}`);
+}
+
 console.log(failures ? `\n${failures} check(s) failed` : '\nAll wheel checks passed');
 process.exit(failures ? 1 : 0);
