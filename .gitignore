@@ -1,0 +1,32 @@
+# Dependencies and build output
+node_modules/
+dist/
+*.tsbuildinfo
+
+# Local reference material, kept out of the repository
+*.mp4
+*.mov
+*reference*.*
+* ref.jpeg
+frontend/
+frontend.zip
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Logs, editors and OS files
+*.log
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Python backend
+.venv/
+.pip-tmp/
+__pycache__/
+*.db
+*.db-shm
+*.db-wal
