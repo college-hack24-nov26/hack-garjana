@@ -40,3 +40,9 @@ __pycache__/
 # Internal engineering documents
 /Backend/AutoTwin_Generative_Engineering_Build_Spec.md
 /Backend/AutoTwin_v1.1_Engineering_Integration_Addendum.md
+
+# Internal design and UI documents
+/DESIGN_SYSTEM.md
+/DESIGN_RESEARCH.md
+/REDESIGN_CHANGELOG.md
+/UI_REDESIGN_AUDIT.md
